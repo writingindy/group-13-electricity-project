@@ -2,3 +2,4 @@ streamlit
 gridstatus
 psycopg2-binary
 sqlalchemy
+matplotlib

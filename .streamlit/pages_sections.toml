@@ -1,6 +1,6 @@
 [[pages]]
 path = "streamlit_app.py"
-name = "Home"
+name = "Electricity Data Dashboard"
 icon = ":electric_plug:"
 
 [[pages]]

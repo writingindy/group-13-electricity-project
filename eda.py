@@ -1,6 +1,15 @@
-from streamlit_app import load_table_based_on_timerange
 import streamlit as st
 
+@st.cache_data
+def load_table_based_on_timerange(timemin, timemax, table):
+    
+    conn = st.connection("postgresql", type="sql")
+    if timemax is None:
+        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timemin}\';", ttl="10m")
+    else:
+        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timemin}\' AND time < \'{timemax}\';", ttl="10m")
+    
+    return res
 
 nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
 

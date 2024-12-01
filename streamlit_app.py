@@ -98,7 +98,7 @@ weekday_load_avg_overall = nyiso_load_copy.groupby('Weekday').mean()
 fig2 = plt.figure(figsize=(12, 6))
 
 for year in nyiso_load_copy['Year'].unique():
-    weekday_data = weekday_load_avg_per_year['Load'][year]
+    weekday_data = weekday_load_avg_per_year['load'][year]
     plt.plot(weekday_data.index, weekday_data, alpha=0.3, label=str(year))
 
 

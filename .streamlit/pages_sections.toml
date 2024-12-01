@@ -1,7 +1,7 @@
 [[pages]]
 path = "streamlit_app.py"
 name = "Home"
-icon = ":electric-plug:"
+icon = ":electric_plug:"
 
 [[pages]]
 path = "eda.py"

@@ -17,7 +17,7 @@ This web app will present some exploratory data analysis on electricity data, ga
 def load_table_based_on_timerange(timerange, table):
     
     conn = st.connection("postgresql", type="sql")
-    res = conn.query(f"SELECT * FROM {table} WHERE time >= {timerange};", ttl="10m")
+    res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timerange}\';", ttl="10m")
     
     return res
 

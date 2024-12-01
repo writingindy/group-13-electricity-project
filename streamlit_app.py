@@ -23,9 +23,9 @@ def load_table_based_on_timerange(timerange, table):
 
 
 
+nyiso_load = load_table_based_on_timerange('2019-01-01', 'nyiso_load')
 
-conn = st.connection("postgresql", type="sql")
-nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
+#nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
 
 
 

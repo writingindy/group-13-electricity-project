@@ -5,6 +5,11 @@ import gridstatus
 import psycopg2
 warnings.filterwarnings('ignore')
 
+st.set_page_config(
+    page_title='Electricity Data Dashboard',
+    page_icon=':electric_plug:', # This is an emoji shortcode. Could be a URL too.
+)
+
 
 st.title("Electricity Data Dashboard")
 
@@ -14,16 +19,18 @@ This web app will present some exploratory data analysis on electricity data, ga
 '''
 
 @st.cache_data
-def load_table_based_on_timerange(timerange, table):
+def load_table_based_on_timerange(timemin, timemax, table):
     
     conn = st.connection("postgresql", type="sql")
-    res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timerange}\';", ttl="10m")
+    if timemax is None:
+        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timemin}\';", ttl="10m")
+    else:
+        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timemin}\' AND time < \'{timemax}\';", ttl="10m")
     
     return res
 
 
-
-nyiso_load = load_table_based_on_timerange('2019-01-01', 'nyiso_load')
+nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
 
 #nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
 

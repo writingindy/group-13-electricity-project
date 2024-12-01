@@ -12,7 +12,6 @@ st.set_page_config(
     page_icon=':electric_plug:', # This is an emoji shortcode. Could be a URL too.
 )
 
-st.set_page_config(layout="wide")
 
 # If you want to use the no-sections version, this
 # defaults to looking in .streamlit/pages.toml, so you can

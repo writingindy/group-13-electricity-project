@@ -34,7 +34,7 @@ nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
 
 #nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
 
-
+st.header('Exploratory Data Analysis', divider='gray')
 
 import pandas as pd
 import matplotlib.pyplot as plt

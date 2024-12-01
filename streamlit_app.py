@@ -102,7 +102,7 @@ for year in nyiso_load_copy['Year'].unique():
     plt.plot(weekday_data.index, weekday_data, alpha=0.3, label=str(year))
 
 
-plt.plot(weekday_load_avg_overall.index, weekday_load_avg_overall['Load'], color='blue', linewidth=3, label='Average Load')
+plt.plot(weekday_load_avg_overall.index, weekday_load_avg_overall['load'], color='blue', linewidth=3, label='Average Load')
 
 
 plt.title('Historical New York Load Data - Daily Averages by Weekday')

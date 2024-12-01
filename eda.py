@@ -1,4 +1,6 @@
-import streamlit_app
+from streamlit_app import load_table_based_on_timerange
+import streamlit as st
+
 
 nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
 

@@ -160,6 +160,7 @@ dmypy.json
 cython_debug/
 
 # Jupyter Notebooks
+historical-data-ingestion.py
 historical-data-ingestion.ipynb
 streamlit-dashboard.ipynb
 

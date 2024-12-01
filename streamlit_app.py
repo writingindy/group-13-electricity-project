@@ -2,13 +2,30 @@ import streamlit as st
 import pandas as pd
 import warnings
 import gridstatus
+import psycopg2
 warnings.filterwarnings('ignore')
 
 
 st.title("Electricity Data Dashboard")
 
+
+'''
+This web app will present some exploratory data analysis on electricity data, gathered from the gridstatus API.
+'''
+
+@st.cache_data
+def load_table_based_on_timerange(timerange, table):
+    
+    conn = st.connection("postgresql", type="sql")
+    res = conn.query(f"SELECT * FROM {table} WHERE time >= {timerange};", ttl="10m")
+    
+    return res
+
+
+
+
 conn = st.connection("postgresql", type="sql")
-nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2020-01-01\';', ttl="10m")
+nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
 
 
 

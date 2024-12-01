@@ -3,3 +3,4 @@ gridstatus
 psycopg2-binary
 sqlalchemy
 matplotlib
+st-pages

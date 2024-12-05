@@ -38,7 +38,7 @@ This web app will present some exploratory data analysis on electricity data, ga
 '''
 
 @st.cache_data
-def get_day_data(table) -> pd.DataFrame:
+def get_day_data(table):
     today = str(datetime.date.today())
 
     conn = st.connection("postgresql", type="sql")

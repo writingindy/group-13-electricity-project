@@ -162,7 +162,9 @@ st.write(
     "This is a plot of the Monthly Average Electricity Load for NYISO. You can choose the timerange you want to explore."
 )
 
+nyiso_load_timelimits = pd.date_range(start="Jan 1, 2002", end="today")
 
+nyiso_load_min_time_filter = st.date_input("Select start date", value=None, min_value="Jan 1, 2002", max_value="today")
 
 
 

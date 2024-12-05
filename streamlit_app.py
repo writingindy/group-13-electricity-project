@@ -37,7 +37,7 @@ st.title("Electricity Data Dashboard")
 This web app will present some exploratory data analysis on electricity data, gathered from the gridstatus API.
 '''
 
-@st.experimental_memo
+@st.cache_data
 def get_day_data(table) -> pd.DataFrame:
     today = str(datetime.date.today())
 

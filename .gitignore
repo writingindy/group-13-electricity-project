@@ -159,8 +159,9 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
-# Jupyter Notebooks
+# Jupyter Notebooks and Python scripts
 historical-data-ingestion.py
+pyspark_test.py
 historical-data-ingestion.ipynb
 streamlit-dashboard.ipynb
 

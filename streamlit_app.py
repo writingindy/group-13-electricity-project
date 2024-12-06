@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 import warnings
 import plotly.express as px
 import gridstatus
@@ -12,7 +13,7 @@ from st_pages import add_page_title, get_nav_from_toml
 warnings.filterwarnings('ignore')
 
 st.set_page_config(
-    #layout="wide",
+    layout="wide",
     page_title='Electricity Data Dashboard',
     page_icon=':electric_plug:', # This is an emoji shortcode. Could be a URL too.
 )
@@ -39,9 +40,9 @@ This web app has two sections:
 - The second section will present some interactive exploratory data analysis on electricity load and fuel mix data, gathered from the gridstatus API.
 '''
 
-st.header('Live Dashboard')
+st.header('Live Dashboard', divider='gray')
 
-#@st.cache_data
+@st.cache_data
 def get_day_data(table):
     #today = datetime.date.today()
     #tomorrow = datetime.date.today() + datetime.timedelta(days=1)
@@ -54,6 +55,7 @@ def get_day_data(table):
     res = res.sort_values(by='time')
 
     return res
+
 
 def plot_day_load(table):
     data = get_day_data(table)
@@ -86,6 +88,8 @@ def plot_day_load(table):
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 nyiso_tab.pyplot(plot_day_load('nyiso_load'))
 caiso_tab.pyplot(plot_day_load('caiso_load'))
+isone_tab.pyplot(plot_day_load('isone_load'))
+
 
 
 @st.cache_data
@@ -99,6 +103,7 @@ def load_table_based_on_timerange(timemin, timemax, table):
     
     return res
 
+@st.cache_resource
 def plot_monthly_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
 
@@ -108,6 +113,10 @@ def plot_monthly_table_based_on_timerange(timemin, timemax, table):
                 'caiso_fuel_mix': 'California',
                 'isone_load': 'New England',
                 'isone_fuel_mix': 'New England'}
+
+    fuel_sources = [
+    'dual_fuel', 'hydro', 'natural_gas', 'nuclear',
+    'other_fossil_fuels', 'other_renewables', 'wind']
 
     if 'load' in table:
         data_type = 'load'
@@ -125,18 +134,20 @@ def plot_monthly_table_based_on_timerange(timemin, timemax, table):
     monthly_avg_per_year = data_copy.groupby(['Year', 'Month']).mean().unstack(level=0)
     monthly_avg_overall = data_copy.groupby('Month').mean()
 
-    fig = plt.figure(figsize=(12, 6))
+    bottoms = [0] * len(monthly_avg_overall)
 
-    for year in data_copy['Year'].unique():
-        monthly = monthly_avg_per_year[data_type][year]
-        plt.plot(monthly.index, monthly, alpha=0.3, label=str(year))
+    fig = plt.figure(figsize=(12, 6))
 
     
     if data_type == 'load':
+        for year in data_copy['Year'].unique():
+            monthly = monthly_avg_per_year[data_type][year]
+            plt.plot(monthly.index, monthly, alpha=0.3, label=str(year))
+
         plt.plot(monthly_avg_overall.index, monthly_avg_overall[data_type], color='blue', linewidth=3, label='Average Load')
-        plt.title(f'Historical {data_map[table]} Load Data - Monthly Averages')
-        plt.xlabel('Month')
-        plt.ylabel('Load (MW)')
+        plt.title(f'Historical {data_map[table]} Load Data - Monthly Averages', fontsize=16)
+        plt.xlabel('Month', fontsize=12)
+        plt.ylabel('Load (MW)', fontsize=12)
 
         plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
         plt.xlim([1, 12])
@@ -144,8 +155,31 @@ def plot_monthly_table_based_on_timerange(timemin, timemax, table):
         plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
         plt.grid(True)
         plt.tight_layout()
+    elif data_type == 'fuel_mix':
+        for fuel_source in fuel_sources:
+            plt.bar(monthly_avg_overall.index,
+                monthly_avg_overall[fuel_source],
+                bottom=bottoms,
+                label=fuel_source,
+                color=cm.get_cmap('tab20c', len(fuel_sources))(fuel_sources.index(fuel_source)),
+                alpha=0.7)
+            bottoms = [bottom + value for bottom, value in zip(bottoms, monthly_avg_overall[fuel_source])]
+
+        plt.title(f'Historical {data_map[table]} Fuel Mix - Monthly Averages', fontsize=16)
+        plt.xlabel('Month', fontsize=12)
+        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+
+        plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+        plt.xlim([1, 12])
+        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper left')
+
+
+        plt.grid(True)
+        plt.tight_layout()
     return fig
 
+@st.cache_resource
 def plot_weekly_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
 
@@ -155,7 +189,10 @@ def plot_weekly_table_based_on_timerange(timemin, timemax, table):
                 'caiso_fuel_mix': 'California',
                 'isone_load': 'New England',
                 'isone_fuel_mix': 'New England'}
-    
+    fuel_sources = [
+    'dual_fuel', 'hydro', 'natural_gas', 'nuclear',
+    'other_fossil_fuels', 'other_renewables', 'wind']
+
     if 'load' in table:
         data_type = 'load'
     else:
@@ -171,27 +208,49 @@ def plot_weekly_table_based_on_timerange(timemin, timemax, table):
 
     weekday_avg_per_year = data_copy.groupby(['Year', 'Weekday']).mean().unstack(level=0)
     weekday_avg_overall = data_copy.groupby('Weekday').mean()
+
+    bottoms = [0] * len(weekday_avg_overall)
     
     fig = plt.figure(figsize=(12, 6))
+    if data_type == "load":
+        for year in data_copy['Year'].unique():
+            weekday_data = weekday_avg_per_year[data_type][year]
+            plt.plot(weekday_data.index, weekday_data, alpha=0.3, label=str(year))
 
-    for year in data_copy['Year'].unique():
-        weekday_data = weekday_avg_per_year[data_type][year]
-        plt.plot(weekday_data.index, weekday_data, alpha=0.3, label=str(year))
+        plt.plot(weekday_avg_overall.index, weekday_avg_overall[data_type], color='blue', linewidth=3, label='Average Load')
+        plt.title(f'Historical {data_map[table]} Load Data - Daily Averages by Weekday')
+        plt.xlabel('Weekday')
+        plt.ylabel('Load (MW)')
+        
+        plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+        plt.xlim([0, 6])
 
-    plt.plot(weekday_avg_overall.index, weekday_avg_overall[data_type], color='blue', linewidth=3, label='Average Load')
-    plt.title(f'Historical {data_map[table]} Load Data - Daily Averages by Weekday')
-    plt.xlabel('Weekday')
-    plt.ylabel('Load (MW)')
-    
-    plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
-    plt.xlim([0, 6])
+        plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
+        plt.grid(True)
+        plt.tight_layout()
+    elif data_type == "fuel_mix":
+        for fuel_source in fuel_sources:
+            plt.bar(weekday_avg_overall.index,
+                weekday_avg_overall[fuel_source],
+                bottom=bottoms,
+                label=fuel_source,
+                color=cm.get_cmap('tab20c', len(fuel_sources))(fuel_sources.index(fuel_source)),
+                alpha=0.7)
+            bottoms = [bottom + value for bottom, value in zip(bottoms, weekday_avg_overall[fuel_source])]
 
-    plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
-    plt.grid(True)
-    plt.tight_layout()
+        plt.title(f'Historical {data_map[table]} Fuel Mix - Daily Averages by Weekday', fontsize=16)
+        plt.xlabel('Weekday', fontsize=12)
+        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+        plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+        plt.xlim([0, 6])
+        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        plt.grid(True)
+        plt.tight_layout()        
     return fig
 
-
+@st.cache_resource
 def plot_daily_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
 
@@ -201,6 +260,10 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
                 'caiso_fuel_mix': 'California',
                 'isone_load': 'New England',
                 'isone_fuel_mix': 'New England'}
+
+    fuel_sources = [
+    'dual_fuel', 'hydro', 'natural_gas', 'nuclear',
+    'other_fossil_fuels', 'other_renewables', 'wind']
     
     if 'load' in table:
         data_type = 'load'
@@ -218,27 +281,49 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
     hourly_avg_per_year = data_copy.groupby(['Year', 'Hour']).mean().unstack(level=0)
     hourly_avg_overall = data_copy.groupby('Hour').mean()
 
+    bottoms = [0] * len(hourly_avg_overall)
+
     fig = plt.figure(figsize=(12, 6))
-
-    for year in data_copy['Year'].unique():
-        hourly_data = hourly_avg_per_year['load'][year]
-        plt.plot(hourly_data.index, hourly_data, alpha=0.3, label=str(year))
-
-
-    plt.plot(hourly_avg_overall.index, hourly_avg_overall['load'], color='blue', linewidth=3, label='Average Load')
+    if data_type == "load":
+        for year in data_copy['Year'].unique():
+            hourly_data = hourly_avg_per_year['load'][year]
+            plt.plot(hourly_data.index, hourly_data, alpha=0.3, label=str(year))
 
 
-    plt.title(f'Historical {data_map[table]} Load Data - Hourly Averages')
-    plt.xlabel('Hour of Day')
-    plt.ylabel('Load (MW)')
+        plt.plot(hourly_avg_overall.index, hourly_avg_overall['load'], color='blue', linewidth=3, label='Average Load')
 
 
-    plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
-    plt.xlim([0, 23])
+        plt.title(f'Historical {data_map[table]} Load Data - Hourly Averages')
+        plt.xlabel('Hour of Day')
+        plt.ylabel('Load (MW)')
 
-    plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
-    plt.grid(True)
-    plt.tight_layout()
+
+        plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
+        plt.xlim([0, 23])
+
+        plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
+        plt.grid(True)
+        plt.tight_layout()
+    elif data_type == "fuel_mix":
+        for fuel_source in fuel_sources:
+            plt.bar(hourly_avg_overall.index,
+                hourly_avg_overall[fuel_source],
+                bottom=bottoms,
+                label=fuel_source,
+                color=cm.get_cmap('tab20c', len(fuel_sources))(fuel_sources.index(fuel_source)),
+                alpha=0.7)
+            bottoms = [bottom + value for bottom, value in zip(bottoms, hourly_avg_overall[fuel_source])]
+
+        plt.title(f'Historical {data_map[table]} Fuel Mix - Hourly Averages', fontsize=16)
+        plt.xlabel('Hour of Day', fontsize=12)
+        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+        plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
+        plt.xlim([0, 23])
+        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper left')
+
+        plt.grid(True)
+        plt.tight_layout()        
     return fig
 
 #nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
@@ -253,36 +338,69 @@ st.write(
     "This is a plot of the Monthly Average Electricity Load for NYISO. You can choose the timerange you want to explore."
 )
 
+st.subheader("NYISO")
+
+nyiso_eda_tab, caiso__eda_tab, isone_eda_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 
 @st.fragment()
 def trigger_nyiso_replots():
-    fig1 = plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
-    fig2 = plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
-    fig3 = plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
+        with col1:
+            fig1 = plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
+            fig2 = plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
+            fig3 = plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
 
-    plot_monthly_placeholder.pyplot(fig1)
-    plot_weekly_placeholder.pyplot(fig2)
-    plot_daily_placeholder.pyplot(fig3)
+            plot_monthly_placeholder.pyplot(fig1)
 
-nyiso_load_min_time_filter = st.date_input("Start date:", 
+            plot_weekly_placeholder.pyplot(fig2)
+
+            plot_daily_placeholder.pyplot(fig3)
+
+        
+        with col2:
+            fig4 = plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix')
+            fig5 = plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix')
+            fig6 = plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix')
+
+            plot_monthly_fuel_mix_placeholder.pyplot(fig4)
+
+            plot_weekly_fuel_mix_placeholder.pyplot(fig5)
+
+            plot_daily_fuel_mix_placeholder.pyplot(fig6)
+
+
+
+
+
+
+with nyiso_eda_tab:
+
+    nyiso_load_min_time_filter = st.date_input("Start date:", 
                                             value=pd.to_datetime('2021-01-01'), 
                                             min_value=pd.to_datetime('2002-01-01'), 
                                             max_value=datetime.date.today(),
                                             on_change=trigger_nyiso_replots)
-nyiso_load_max_time_filter = st.date_input("End date:", 
+    nyiso_load_max_time_filter = st.date_input("End date:", 
                                             value=datetime.date.today(), 
                                             min_value=pd.to_datetime('2002-01-01'), 
                                             max_value=datetime.date.today(),
                                             on_change=trigger_nyiso_replots)
 
+    col1, col2 = st.columns(2, vertical_alignment = "center")
 
-plot_monthly_placeholder = st.empty()
-plot_weekly_placeholder = st.empty()
-plot_daily_placeholder = st.empty()
+    with col1:
+        plot_monthly_placeholder = st.empty()
+        plot_weekly_placeholder = st.empty()
+        plot_daily_placeholder = st.empty() 
+        plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
+        plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
+        plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
 
-plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
-plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
-plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
-
+    with col2:
+        plot_monthly_fuel_mix_placeholder = st.empty()
+        plot_weekly_fuel_mix_placeholder = st.empty()
+        plot_daily_fuel_mix_placeholder = st.empty()
+        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix'))
+        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix'))
+        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix'))
 
     

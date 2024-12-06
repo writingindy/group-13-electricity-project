@@ -30,7 +30,7 @@ st.set_page_config(
 
 
 
-st.title("Electricity Data Dashboard")
+st.title(":electric_plug: Electricity Data Dashboard")
 
 
 '''
@@ -38,6 +38,8 @@ This web app has two sections:
 - The first section will present a live dashboard of the current day's electricity load and fuel mix, as well as the forecasted load.
 - The second section will present some interactive exploratory data analysis on electricity load and fuel mix data, gathered from the gridstatus API.
 '''
+
+st.header('Live Dashboard')
 
 #@st.cache_data
 def get_day_data(table):

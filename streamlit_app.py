@@ -37,7 +37,7 @@ st.title("Electricity Data Dashboard")
 This web app will present a live dashboard of the day's electricity load and fuel mixsome exploratory data analysis on electricity data, gathered from the gridstatus API.
 '''
 
-@st.cache_data
+#@st.cache_data
 def get_day_data(table):
     #today = datetime.date.today()
     #tomorrow = datetime.date.today() + datetime.timedelta(days=1)

@@ -109,7 +109,7 @@ def load_table_based_on_timerange(timemin, timemax, table):
     
     return res
 
-def plot_table_based_on_timerange(timemin, timemax, table):
+def plot_monthly_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
 
     data_map = {'nyiso_load': 'New York', 
@@ -119,12 +119,15 @@ def plot_table_based_on_timerange(timemin, timemax, table):
                 'isone_load': 'New England',
                 'isone_fuel_mix': 'New England'}
 
+    if 'load' in table:
+        data_type = 'load'
+    else:
+        data_type = 'fuel_mix'
+
     data_copy = data.copy()
 
     data_copy['time'] = pd.to_datetime(data_copy['time'])
     data_copy.set_index('time', inplace=True)
-
-    daily_data = data_copy.resample('D').mean()
 
     data_copy['Year'] = data_copy.index.year
     data_copy['Month'] = data_copy.index.month
@@ -135,26 +138,75 @@ def plot_table_based_on_timerange(timemin, timemax, table):
     fig = plt.figure(figsize=(12, 6))
 
     for year in data_copy['Year'].unique():
-        monthly = monthly_avg_per_year['load'][year]
+        monthly = monthly_avg_per_year[data_type][year]
         plt.plot(monthly.index, monthly, alpha=0.3, label=str(year))
 
-    plt.plot(monthly_avg_overall.index, monthly_avg_overall['load'], color='blue', linewidth=3, label='Average Load')
-    plt.title(f'Historical {data_map[table]} Load Data - Monthly Averages')
-    plt.xlabel('Month')
-    plt.ylabel('Load (MW)')
+    
+    if data_type == 'load':
+        plt.plot(monthly_avg_overall.index, monthly_avg_overall[data_type], color='blue', linewidth=3, label='Average Load')
+        plt.title(f'Historical {data_map[table]} Load Data - Monthly Averages')
+        plt.xlabel('Month')
+        plt.ylabel('Load (MW)')
 
-    plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-    plt.xlim([1, 12])
+        plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+        plt.xlim([1, 12])
+
+        plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
+        plt.grid(True)
+        plt.tight_layout()
+    return fig
+
+def plot_weekly_table_based_on_timerange(timemin, timemax, table):
+    data = load_table_based_on_timerange(timemin, timemax, table)
+
+    data_map = {'nyiso_load': 'New York', 
+                'nyiso_fuel_mix': 'New York',
+                'caiso_load': 'California',
+                'caiso_fuel_mix': 'California',
+                'isone_load': 'New England',
+                'isone_fuel_mix': 'New England'}
+    
+    if 'load' in table:
+        data_type = 'load'
+    else:
+        data_type = 'fuel_mix'
+
+    data_copy = data.copy()
+
+    data_copy['time'] = pd.to_datetime(data_copy['time'])
+    data_copy.set_index('time', inplace=True)
+
+    data_copy['Year'] = data_copy.index.year
+    data_copy['Weekday'] = data_copy.index.weekday
+
+    weekday_avg_per_year = data_copy.groupby(['Year', 'Weekday']).mean().unstack(level=0)
+    weekday_avg_overall = data_copy.groupby('Weekday').mean()
+    
+    fig = plt.figure(figsize=(12, 6))
+
+    for year in data_copy['Year'].unique():
+        weekday_data = weekday_avg_per_year[data_type][year]
+        plt.plot(weekday_data.index, weekday_data, alpha=0.3, label=str(year))
+
+    plt.plot(weekday_avg_overall.index, weekday_avg_overall[data_type], color='blue', linewidth=3, label='Average Load')
+    plt.title(f'Historical {data_map[table]} Load Data - Daily Averages by Weekday')
+    plt.xlabel('Weekday')
+    plt.ylabel('Load (MW)')
+    
+    plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+    plt.xlim([0, 6])
 
     plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
     plt.grid(True)
     plt.tight_layout()
-    st.pyplot(fig)
+    return fig
 
 
 nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
 
 #nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
+
+
 
 st.header('Exploratory Data Analysis', divider='gray')
 
@@ -162,10 +214,35 @@ st.write(
     "This is a plot of the Monthly Average Electricity Load for NYISO. You can choose the timerange you want to explore."
 )
 
-nyiso_load_timelimits = pd.date_range(start="Jan 1, 2002", end="today")
 
-nyiso_load_min_time_filter = st.date_input("Select start date", value=None, min_value="Jan 1, 2002", max_value="today")
+@st.fragment()
+def trigger_nyiso_replots():
+    fig1 = plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
+    fig2 = plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
+
+    plot_monthly_placeholder.pyplot(fig1)
+    plot_weekly_placeholder.pyplot(fig2)
+
+nyiso_load_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots)
+nyiso_load_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots)
+
+
+plot_monthly_placeholder = st.empty()
+plot_weekly_placeholder = st.empty()
 
 
 
+plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
+plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
 
+
+
+    

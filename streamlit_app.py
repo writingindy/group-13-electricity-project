@@ -34,10 +34,10 @@ st.title("Electricity Data Dashboard")
 
 
 '''
-This web app will present some exploratory data analysis on electricity data, gathered from the gridstatus API.
+This web app will present a live dashboard of the day's electricity load and fuel mixsome exploratory data analysis on electricity data, gathered from the gridstatus API.
 '''
 
-#@st.cache_data
+@st.cache_data
 def get_day_data(table):
     today = str(datetime.date.today())
 
@@ -47,9 +47,28 @@ def get_day_data(table):
 
     return res
 
+def plot_day_load(table):
+    data = get_day_data(table)
+    data_map = {'nyiso_load': 'New York', 
+                'nyiso_fuel_mix': 'New York',
+                'caiso_load': 'California',
+                'caiso_fuel_mix': 'California',
+                'isone_load': 'New England',
+                'isone_fuel_mix': 'New England'}
+    
+    fig = plt.figure(figsize=(12, 6))
+
+    return fig
+    
+
+    
+
 #today_nyiso_load = get_day_data('nyiso_load')
 
-placeholder = st.empty()
+
+nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
+nyiso_tab.pyplot(plot_day_load('nyiso_load'))
+
 
 #with placeholder.container():
 

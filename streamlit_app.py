@@ -39,11 +39,15 @@ This web app will present a live dashboard of the day's electricity load and fue
 
 @st.cache_data
 def get_day_data(table):
-    today = str(datetime.date.today())
+    #today = datetime.date.today()
+    #tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    today = pd.to_datetime('2024-11-26')
+    tomorrow = pd.to_datetime('2024-11-27')
 
     conn = st.connection("postgresql", type="sql")
     
-    res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{today}\';", ttl="10m")
+    res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{today}\' AND time < \'{tomorrow}\';", ttl="10m")
+    res = res.sort_values(by='time')
 
     return res
 
@@ -58,9 +62,17 @@ def plot_day_load(table):
     
     fig = plt.figure(figsize=(12, 6))
 
+    data_copy = data.copy()
+
+    #data_copy['time'] = pd.to_datetime(data_copy['time'])
+    #data_copy.set_index('time', inplace=True)
+
+    #data_copy['Hour'] = data_copy.index.hour
+    
+    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Average Load')
+
     return fig
     
-
     
 
 #today_nyiso_load = get_day_data('nyiso_load')
@@ -69,53 +81,6 @@ def plot_day_load(table):
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 nyiso_tab.pyplot(plot_day_load('nyiso_load'))
 
-
-#with placeholder.container():
-
-    # create three columns
-#    nyiso_load, caiso_load, isone_load = st.columns(3)
-
-    # fill in those three columns with respective metrics or KPIs
-    #kpi1.metric(
-    #    label="Age ⏳",
-    #    value=round(avg_age),
-    #    delta=round(avg_age) - 10,
-    #)
-    
-    #kpi2.metric(
-    #    label="Married Count 💍",
-    #    value=int(count_married),
-    #    delta=-10 + count_married,
-    #)
-    
-    #kpi3.metric(
-    #    label="A/C Balance ＄",
-    #    value=f"$ {round(balance,2)} ",
-    #    delta=-round(balance / count_married) * 100,
-    #)
-
-    # create two columns for charts
-#    fig_col1, fig_col2 = st.columns(2)
-    
-#    with fig_col1:
-#        st.markdown("### First Chart")
-    #    fig = px.density_heatmap(
-    #        data_frame=df, y="age_new", x="marital"
-    #    )
-    #    st.write(fig)
-        
-#    with fig_col2:
-#        st.markdown("### Second Chart")
-    #    fig2 = px.histogram(data_frame=df, x="age_new")
-    #    st.write(fig2)
-
-#    st.markdown("### Detailed Data View")
-    #st.dataframe(df)
-    #time.sleep(1)
-
-
-    
-    #return pd.read_csv(dataset_url)
 
 @st.cache_data
 def load_table_based_on_timerange(timemin, timemax, table):
@@ -221,7 +186,56 @@ def plot_weekly_table_based_on_timerange(timemin, timemax, table):
     return fig
 
 
-nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
+def plot_daily_table_based_on_timerange(timemin, timemax, table):
+    data = load_table_based_on_timerange(timemin, timemax, table)
+
+    data_map = {'nyiso_load': 'New York', 
+                'nyiso_fuel_mix': 'New York',
+                'caiso_load': 'California',
+                'caiso_fuel_mix': 'California',
+                'isone_load': 'New England',
+                'isone_fuel_mix': 'New England'}
+    
+    if 'load' in table:
+        data_type = 'load'
+    else:
+        data_type = 'fuel_mix'
+
+    data_copy = data.copy()
+
+    data_copy['time'] = pd.to_datetime(data_copy['time'])
+    data_copy.set_index('time', inplace=True)
+
+    data_copy['Year'] = data_copy.index.year
+    data_copy['Hour'] = data_copy.index.hour
+
+    hourly_avg_per_year = data_copy.groupby(['Year', 'Hour']).mean().unstack(level=0)
+    hourly_avg_overall = data_copy.groupby('Hour').mean()
+
+    fig = plt.figure(figsize=(12, 6))
+
+    for year in data_copy['Year'].unique():
+        hourly_data = hourly_avg_per_year['load'][year]
+        plt.plot(hourly_data.index, hourly_data, alpha=0.3, label=str(year))
+
+
+    plt.plot(hourly_avg_overall.index, hourly_avg_overall['load'], color='blue', linewidth=3, label='Average Load')
+
+
+    plt.title(f'Historical {data_map[table]} Load Data - Hourly Averages')
+    plt.xlabel('Hour of Day')
+    plt.ylabel('Load (MW)')
+
+
+    plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
+    plt.xlim([0, 23])
+
+    plt.legend(title='Year', loc='upper right', bbox_to_anchor=(1.05, 1))
+    plt.grid(True)
+    plt.tight_layout()
+    return fig
+
+#nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
 
 #nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
 
@@ -238,9 +252,11 @@ st.write(
 def trigger_nyiso_replots():
     fig1 = plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
     fig2 = plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
+    fig3 = plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load')
 
     plot_monthly_placeholder.pyplot(fig1)
     plot_weekly_placeholder.pyplot(fig2)
+    plot_daily_placeholder.pyplot(fig3)
 
 nyiso_load_min_time_filter = st.date_input("Start date:", 
                                             value=pd.to_datetime('2021-01-01'), 
@@ -256,10 +272,11 @@ nyiso_load_max_time_filter = st.date_input("End date:",
 
 plot_monthly_placeholder = st.empty()
 plot_weekly_placeholder = st.empty()
+plot_daily_placeholder = st.empty()
 
 plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
 plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
-
+plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
 
 
     

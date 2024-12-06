@@ -44,10 +44,10 @@ st.header('Live Dashboard', divider='gray')
 
 @st.cache_data
 def get_day_data(table):
-    #today = datetime.date.today()
-    #tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-    today = pd.to_datetime('2024-11-26')
-    tomorrow = pd.to_datetime('2024-11-27')
+    today = datetime.date.today()
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    #today = pd.to_datetime('2024-11-26')
+    #tomorrow = pd.to_datetime('2024-11-27')
 
     conn = st.connection("postgresql", type="sql")
     

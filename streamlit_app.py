@@ -34,7 +34,9 @@ st.title("Electricity Data Dashboard")
 
 
 '''
-This web app will present a live dashboard of the day's electricity load and fuel mixsome exploratory data analysis on electricity data, gathered from the gridstatus API.
+This web app has two sections:
+- The first section will present a live dashboard of the current day's electricity load and fuel mix, as well as the forecasted load.
+- The second section will present some interactive exploratory data analysis on electricity load and fuel mix data, gathered from the gridstatus API.
 '''
 
 #@st.cache_data

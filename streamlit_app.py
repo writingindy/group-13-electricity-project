@@ -37,7 +37,7 @@ st.title("Electricity Data Dashboard")
 This web app will present some exploratory data analysis on electricity data, gathered from the gridstatus API.
 '''
 
-@st.cache_data
+#@st.cache_data
 def get_day_data(table):
     today = str(datetime.date.today())
 
@@ -237,8 +237,6 @@ nyiso_load_max_time_filter = st.date_input("End date:",
 
 plot_monthly_placeholder = st.empty()
 plot_weekly_placeholder = st.empty()
-
-
 
 plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
 plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))

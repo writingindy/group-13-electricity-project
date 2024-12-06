@@ -57,6 +57,7 @@ def get_day_data(table):
 
 def plot_day_load(table):
     data = get_day_data(table)
+    
     data_map = {'nyiso_load': 'New York', 
                 'nyiso_fuel_mix': 'New York',
                 'caiso_load': 'California',
@@ -84,6 +85,7 @@ def plot_day_load(table):
 
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 nyiso_tab.pyplot(plot_day_load('nyiso_load'))
+caiso_tab.pyplot(plot_day_load('caiso_load'))
 
 
 @st.cache_data

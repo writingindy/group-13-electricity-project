@@ -25,7 +25,7 @@ nyiso_fuel_sources = [
     'other_fossil_fuels', 'other_renewables', 'wind']
 
 caiso_fuel_sources = [
-    'solar', 'wind', 'geothermal', 'biomass', 'biogas', 'small_hydro', 'coal', 'nuclear', 'large_hydro', 'batteries', 'imports', 'other']
+    'solar', 'wind', 'geothermal', 'biomass', 'biogas', 'small_hydro', 'coal', 'nuclear', 'natural_gas', 'large_hydro', 'batteries', 'imports', 'other']
 
 isone_fuel_sources = [
     'coal', 'hydro', 'landfill_gas', 'natural_gas', 'nuclear', 'oil', 'refuse', 'solar', 'wind', 'wood', 'other']

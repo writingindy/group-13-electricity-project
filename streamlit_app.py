@@ -10,6 +10,29 @@ import time
 import psycopg2
 from st_pages import add_page_title, get_nav_from_toml
 
+
+### Global Variables and Helper Functions
+
+data_map = {'nyiso_load': 'New York', 
+                'nyiso_fuel_mix': 'New York',
+                'caiso_load': 'California',
+                'caiso_fuel_mix': 'California',
+                'isone_load': 'New England',
+                'isone_fuel_mix': 'New England'}
+
+nyiso_fuel_sources = [
+    'dual_fuel', 'hydro', 'natural_gas', 'nuclear',
+    'other_fossil_fuels', 'other_renewables', 'wind']
+
+caiso_fuel_sources = [
+    'solar', 'wind', 'geothermal', 'biomass', 'biogas', 'small_hydro', 'coal', 'nuclear', 'large_hydro', 'batteries', 'imports', 'other']
+
+isone_fuel_sources = [
+    'coal', 'hydro', 'landfill_gas', 'natural_gas', 'nuclear', 'oil', 'refuse', 'solar', 'wind', 'wood', 'other']
+
+
+
+
 warnings.filterwarnings('ignore')
 
 st.set_page_config(
@@ -60,13 +83,6 @@ def get_day_data(table):
 def plot_day_load(table):
     data = get_day_data(table)
     
-    data_map = {'nyiso_load': 'New York', 
-                'nyiso_fuel_mix': 'New York',
-                'caiso_load': 'California',
-                'caiso_fuel_mix': 'California',
-                'isone_load': 'New England',
-                'isone_fuel_mix': 'New England'}
-    
     fig = plt.figure(figsize=(12, 6))
 
     data_copy = data.copy()
@@ -100,23 +116,14 @@ def load_table_based_on_timerange(timemin, timemax, table):
         res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timemin}\';", ttl="10m")
     else:
         res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{timemin}\' AND time < \'{timemax}\';", ttl="10m")
-    
+    res = res.sort_values(by='time')
     return res
 
 @st.cache_resource
 def plot_monthly_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
 
-    data_map = {'nyiso_load': 'New York', 
-                'nyiso_fuel_mix': 'New York',
-                'caiso_load': 'California',
-                'caiso_fuel_mix': 'California',
-                'isone_load': 'New England',
-                'isone_fuel_mix': 'New England'}
 
-    fuel_sources = [
-    'dual_fuel', 'hydro', 'natural_gas', 'nuclear',
-    'other_fossil_fuels', 'other_renewables', 'wind']
 
     if 'load' in table:
         data_type = 'load'
@@ -156,42 +163,77 @@ def plot_monthly_table_based_on_timerange(timemin, timemax, table):
         plt.grid(True)
         plt.tight_layout()
     elif data_type == 'fuel_mix':
-        for fuel_source in fuel_sources:
-            plt.bar(monthly_avg_overall.index,
-                monthly_avg_overall[fuel_source],
-                bottom=bottoms,
-                label=fuel_source,
-                color=cm.get_cmap('tab20c', len(fuel_sources))(fuel_sources.index(fuel_source)),
-                alpha=0.7)
-            bottoms = [bottom + value for bottom, value in zip(bottoms, monthly_avg_overall[fuel_source])]
+        if 'nyiso' in table:
+            for fuel_source in nyiso_fuel_sources:
+                plt.bar(monthly_avg_overall.index,
+                    monthly_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(nyiso_fuel_sources))(nyiso_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, monthly_avg_overall[fuel_source])]
 
-        plt.title(f'Historical {data_map[table]} Fuel Mix - Monthly Averages', fontsize=16)
-        plt.xlabel('Month', fontsize=12)
-        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
-
-
-        plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
-        plt.xlim([1, 12])
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Monthly Averages', fontsize=16)
+            plt.xlabel('Month', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
 
 
-        plt.grid(True)
-        plt.tight_layout()
+            plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+            plt.xlim([1, 12])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+
+
+            plt.grid(True)
+            plt.tight_layout()
+        elif 'caiso' in table:
+            for fuel_source in caiso_fuel_sources:
+                plt.bar(monthly_avg_overall.index,
+                    monthly_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(caiso_fuel_sources))(caiso_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, monthly_avg_overall[fuel_source])]
+
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Monthly Averages', fontsize=16)
+            plt.xlabel('Month', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+
+            plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+            plt.xlim([1, 12])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+
+
+            plt.grid(True)
+            plt.tight_layout()
+        elif 'isone' in table:
+            for fuel_source in isone_fuel_sources:
+                plt.bar(monthly_avg_overall.index,
+                    monthly_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(isone_fuel_sources))(isone_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, monthly_avg_overall[fuel_source])]
+
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Monthly Averages', fontsize=16)
+            plt.xlabel('Month', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+
+            plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
+            plt.xlim([1, 12])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+
+
+            plt.grid(True)
+            plt.tight_layout()
     return fig
 
 @st.cache_resource
 def plot_weekly_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
-
-    data_map = {'nyiso_load': 'New York', 
-                'nyiso_fuel_mix': 'New York',
-                'caiso_load': 'California',
-                'caiso_fuel_mix': 'California',
-                'isone_load': 'New England',
-                'isone_fuel_mix': 'New England'}
-    fuel_sources = [
-    'dual_fuel', 'hydro', 'natural_gas', 'nuclear',
-    'other_fossil_fuels', 'other_renewables', 'wind']
 
     if 'load' in table:
         data_type = 'load'
@@ -230,41 +272,71 @@ def plot_weekly_table_based_on_timerange(timemin, timemax, table):
         plt.grid(True)
         plt.tight_layout()
     elif data_type == "fuel_mix":
-        for fuel_source in fuel_sources:
-            plt.bar(weekday_avg_overall.index,
-                weekday_avg_overall[fuel_source],
-                bottom=bottoms,
-                label=fuel_source,
-                color=cm.get_cmap('tab20c', len(fuel_sources))(fuel_sources.index(fuel_source)),
-                alpha=0.7)
-            bottoms = [bottom + value for bottom, value in zip(bottoms, weekday_avg_overall[fuel_source])]
+        if 'nyiso' in table:
+            for fuel_source in nyiso_fuel_sources:
+                plt.bar(weekday_avg_overall.index,
+                    weekday_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(nyiso_fuel_sources))(nyiso_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, weekday_avg_overall[fuel_source])]
 
-        plt.title(f'Historical {data_map[table]} Fuel Mix - Daily Averages by Weekday', fontsize=16)
-        plt.xlabel('Weekday', fontsize=12)
-        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Daily Averages by Weekday', fontsize=16)
+            plt.xlabel('Weekday', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
 
-        plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
-        plt.xlim([0, 6])
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+            plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+            plt.xlim([0, 6])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
-        plt.grid(True)
-        plt.tight_layout()        
+            plt.grid(True)
+            plt.tight_layout()
+        elif 'caiso' in table:
+            for fuel_source in caiso_fuel_sources:
+                plt.bar(weekday_avg_overall.index,
+                    weekday_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(caiso_fuel_sources))(caiso_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, weekday_avg_overall[fuel_source])]
+
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Daily Averages by Weekday', fontsize=16)
+            plt.xlabel('Weekday', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+            plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+            plt.xlim([0, 6])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+
+            plt.grid(True)
+            plt.tight_layout()
+        elif 'isone' in table:
+            for fuel_source in isone_fuel_sources:
+                plt.bar(weekday_avg_overall.index,
+                    weekday_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(isone_fuel_sources))(isone_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, weekday_avg_overall[fuel_source])]
+
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Daily Averages by Weekday', fontsize=16)
+            plt.xlabel('Weekday', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+            plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
+            plt.xlim([0, 6])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+
+            plt.grid(True)
+            plt.tight_layout()        
     return fig
 
 @st.cache_resource
 def plot_daily_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
-
-    data_map = {'nyiso_load': 'New York', 
-                'nyiso_fuel_mix': 'New York',
-                'caiso_load': 'California',
-                'caiso_fuel_mix': 'California',
-                'isone_load': 'New England',
-                'isone_fuel_mix': 'New England'}
-
-    fuel_sources = [
-    'dual_fuel', 'hydro', 'natural_gas', 'nuclear',
-    'other_fossil_fuels', 'other_renewables', 'wind']
     
     if 'load' in table:
         data_type = 'load'
@@ -306,25 +378,66 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
         plt.grid(True)
         plt.tight_layout()
     elif data_type == "fuel_mix":
-        for fuel_source in fuel_sources:
-            plt.bar(hourly_avg_overall.index,
-                hourly_avg_overall[fuel_source],
-                bottom=bottoms,
-                label=fuel_source,
-                color=cm.get_cmap('tab20c', len(fuel_sources))(fuel_sources.index(fuel_source)),
-                alpha=0.7)
-            bottoms = [bottom + value for bottom, value in zip(bottoms, hourly_avg_overall[fuel_source])]
+        if 'nyiso' in table:
+            for fuel_source in nyiso_fuel_sources:
+                plt.bar(hourly_avg_overall.index,
+                    hourly_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(nyiso_fuel_sources))(nyiso_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, hourly_avg_overall[fuel_source])]
 
-        plt.title(f'Historical {data_map[table]} Fuel Mix - Hourly Averages', fontsize=16)
-        plt.xlabel('Hour of Day', fontsize=12)
-        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Hourly Averages', fontsize=16)
+            plt.xlabel('Hour of Day', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
 
-        plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
-        plt.xlim([0, 23])
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+            plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
+            plt.xlim([0, 23])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
-        plt.grid(True)
-        plt.tight_layout()        
+            plt.grid(True)
+            plt.tight_layout()
+        elif 'caiso' in table:
+            for fuel_source in caiso_fuel_sources:
+                plt.bar(hourly_avg_overall.index,
+                    hourly_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(caiso_fuel_sources))(caiso_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, hourly_avg_overall[fuel_source])]
+
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Hourly Averages', fontsize=16)
+            plt.xlabel('Hour of Day', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+            plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
+            plt.xlim([0, 23])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+
+            plt.grid(True)
+            plt.tight_layout()
+        elif 'isone' in table:
+            for fuel_source in isone_fuel_sources:
+                plt.bar(hourly_avg_overall.index,
+                    hourly_avg_overall[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(isone_fuel_sources))(isone_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, hourly_avg_overall[fuel_source])]
+
+            plt.title(f'Historical {data_map[table]} Fuel Mix - Hourly Averages', fontsize=16)
+            plt.xlabel('Hour of Day', fontsize=12)
+            plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+
+            plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
+            plt.xlim([0, 23])
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+
+            plt.grid(True)
+            plt.tight_layout()        
     return fig
 
 #nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
@@ -339,7 +452,7 @@ st.write(
     "These are EDA plots. You can choose the timerange you want to explore."
 )
 
-st.subheader("NYISO")
+#st.subheader("NYISO")
 
 nyiso_eda_tab, caiso_eda_tab, isone_eda_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 

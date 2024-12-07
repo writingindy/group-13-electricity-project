@@ -42,7 +42,7 @@ This web app has two sections:
 
 st.header('Live Dashboard', divider='gray')
 
-@st.cache_data
+#@st.cache_data
 def get_day_data(table):
     today = datetime.date.today()
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
@@ -136,7 +136,7 @@ def plot_monthly_table_based_on_timerange(timemin, timemax, table):
 
     bottoms = [0] * len(monthly_avg_overall)
 
-    fig = plt.figure(figsize=(12, 6))
+    fig = plt.figure(figsize=(12, 7))
 
     
     if data_type == 'load':
@@ -172,7 +172,7 @@ def plot_monthly_table_based_on_timerange(timemin, timemax, table):
 
         plt.xticks(range(1, 13), ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'])
         plt.xlim([1, 12])
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
 
         plt.grid(True)
@@ -211,16 +211,17 @@ def plot_weekly_table_based_on_timerange(timemin, timemax, table):
 
     bottoms = [0] * len(weekday_avg_overall)
     
-    fig = plt.figure(figsize=(12, 6))
+    fig = plt.figure(figsize=(12, 7))
+
     if data_type == "load":
         for year in data_copy['Year'].unique():
             weekday_data = weekday_avg_per_year[data_type][year]
             plt.plot(weekday_data.index, weekday_data, alpha=0.3, label=str(year))
 
         plt.plot(weekday_avg_overall.index, weekday_avg_overall[data_type], color='blue', linewidth=3, label='Average Load')
-        plt.title(f'Historical {data_map[table]} Load Data - Daily Averages by Weekday')
-        plt.xlabel('Weekday')
-        plt.ylabel('Load (MW)')
+        plt.title(f'Historical {data_map[table]} Load Data - Daily Averages by Weekday', fontsize=16)
+        plt.xlabel('Weekday', fontsize=12)
+        plt.ylabel('Load (MW)', fontsize=12)
         
         plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
         plt.xlim([0, 6])
@@ -244,7 +245,7 @@ def plot_weekly_table_based_on_timerange(timemin, timemax, table):
 
         plt.xticks(range(0, 7), ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'])
         plt.xlim([0, 6])
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
         plt.grid(True)
         plt.tight_layout()        
@@ -283,7 +284,7 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
 
     bottoms = [0] * len(hourly_avg_overall)
 
-    fig = plt.figure(figsize=(12, 6))
+    fig = plt.figure(figsize=(12, 7))
     if data_type == "load":
         for year in data_copy['Year'].unique():
             hourly_data = hourly_avg_per_year['load'][year]
@@ -293,9 +294,9 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
         plt.plot(hourly_avg_overall.index, hourly_avg_overall['load'], color='blue', linewidth=3, label='Average Load')
 
 
-        plt.title(f'Historical {data_map[table]} Load Data - Hourly Averages')
-        plt.xlabel('Hour of Day')
-        plt.ylabel('Load (MW)')
+        plt.title(f'Historical {data_map[table]} Load Data - Hourly Averages', fontsize=16)
+        plt.xlabel('Hour of Day', fontsize=12)
+        plt.ylabel('Load (MW)', fontsize=12)
 
 
         plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
@@ -320,7 +321,7 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
 
         plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
         plt.xlim([0, 23])
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper left')
+        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
         plt.grid(True)
         plt.tight_layout()        
@@ -335,12 +336,12 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
 st.header('Exploratory Data Analysis', divider='gray')
 
 st.write(
-    "This is a plot of the Monthly Average Electricity Load for NYISO. You can choose the timerange you want to explore."
+    "These are EDA plots. You can choose the timerange you want to explore."
 )
 
 st.subheader("NYISO")
 
-nyiso_eda_tab, caiso__eda_tab, isone_eda_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
+nyiso_eda_tab, caiso_eda_tab, isone_eda_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 
 @st.fragment()
 def trigger_nyiso_replots():
@@ -357,9 +358,35 @@ def trigger_nyiso_replots():
 
         
         with col2:
-            fig4 = plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix')
-            fig5 = plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix')
-            fig6 = plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix')
+            fig4 = plot_monthly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix')
+            fig5 = plot_weekly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix')
+            fig6 = plot_daily_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix')
+
+            plot_monthly_fuel_mix_placeholder.pyplot(fig4)
+
+            plot_weekly_fuel_mix_placeholder.pyplot(fig5)
+
+            plot_daily_fuel_mix_placeholder.pyplot(fig6)
+
+
+@st.fragment()
+def trigger_caiso_replots():
+        with col1:
+            fig1 = plot_monthly_table_based_on_timerange(caiso_load_min_time_filter, caiso_load_max_time_filter, 'caiso_load')
+            fig2 = plot_weekly_table_based_on_timerange(caiso_load_min_time_filter, caiso_load_max_time_filter, 'caiso_load')
+            fig3 = plot_daily_table_based_on_timerange(caiso_load_min_time_filter, caiso_load_max_time_filter, 'caiso_load')
+
+            plot_monthly_placeholder.pyplot(fig1)
+
+            plot_weekly_placeholder.pyplot(fig2)
+
+            plot_daily_placeholder.pyplot(fig3)
+
+        
+        with col2:
+            fig4 = plot_monthly_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix')
+            fig5 = plot_weekly_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix')
+            fig6 = plot_daily_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix')
 
             plot_monthly_fuel_mix_placeholder.pyplot(fig4)
 
@@ -369,25 +396,24 @@ def trigger_nyiso_replots():
 
 
 
-
-
-
 with nyiso_eda_tab:
-
-    nyiso_load_min_time_filter = st.date_input("Start date:", 
-                                            value=pd.to_datetime('2021-01-01'), 
-                                            min_value=pd.to_datetime('2002-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_nyiso_replots)
-    nyiso_load_max_time_filter = st.date_input("End date:", 
-                                            value=datetime.date.today(), 
-                                            min_value=pd.to_datetime('2002-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_nyiso_replots)
+    st.write("EDA plots for NYISO.")
 
     col1, col2 = st.columns(2, vertical_alignment = "center")
 
     with col1:
+        nyiso_load_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_load_min')
+        nyiso_load_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_load_max')
         plot_monthly_placeholder = st.empty()
         plot_weekly_placeholder = st.empty()
         plot_daily_placeholder = st.empty() 
@@ -396,11 +422,70 @@ with nyiso_eda_tab:
         plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
 
     with col2:
+        nyiso_fuel_mix_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2018-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_fuel_mix_min')
+        nyiso_fuel_mix_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_fuel_mix_max')
+
         plot_monthly_fuel_mix_placeholder = st.empty()
         plot_weekly_fuel_mix_placeholder = st.empty()
         plot_daily_fuel_mix_placeholder = st.empty()
-        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix'))
-        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix'))
-        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_fuel_mix'))
+        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
+        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
+        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
+
+with caiso_eda_tab:
+    st.write("EDA plots for CAISO.")
+
+    col1, col2 = st.columns(2, vertical_alignment = "center")
+
+    with col1:
+        caiso_load_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_caiso_replots,
+                                            key='caiso_load_min')
+        caiso_load_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_caiso_replots,
+                                            key='caiso_load_max')
+        plot_monthly_placeholder = st.empty()
+        plot_weekly_placeholder = st.empty()
+        plot_daily_placeholder = st.empty() 
+        plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(caiso_load_min_time_filter, caiso_load_max_time_filter, 'caiso_load'))
+        plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(caiso_load_min_time_filter, caiso_load_max_time_filter, 'caiso_load'))
+        plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(caiso_load_min_time_filter, caiso_load_max_time_filter, 'caiso_load'))
+
+    with col2:
+        caiso_fuel_mix_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2018-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_caiso_replots,
+                                            key='caiso_fuel_mix_min')
+        caiso_fuel_mix_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_caiso_replots,
+                                            key='caiso_fuel_mix_max')
+
+        plot_monthly_fuel_mix_placeholder = st.empty()
+        plot_weekly_fuel_mix_placeholder = st.empty()
+        plot_daily_fuel_mix_placeholder = st.empty()
+        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix'))
+        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix'))
+        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix'))
 
     

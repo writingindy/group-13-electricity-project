@@ -143,7 +143,7 @@ def plot_monthly_table_based_on_timerange(timemin, timemax, table):
 
     bottoms = [0] * len(monthly_avg_overall)
 
-    fig = plt.figure(figsize=(12, 7))
+    fig = plt.figure(figsize=(14, 8))
 
     
     if data_type == 'load':
@@ -253,7 +253,7 @@ def plot_weekly_table_based_on_timerange(timemin, timemax, table):
 
     bottoms = [0] * len(weekday_avg_overall)
     
-    fig = plt.figure(figsize=(12, 7))
+    fig = plt.figure(figsize=(14, 8))
 
     if data_type == "load":
         for year in data_copy['Year'].unique():
@@ -356,7 +356,7 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
 
     bottoms = [0] * len(hourly_avg_overall)
 
-    fig = plt.figure(figsize=(12, 7))
+    fig = plt.figure(figsize=(14, 8))
     if data_type == "load":
         for year in data_copy['Year'].unique():
             hourly_data = hourly_avg_per_year['load'][year]
@@ -507,6 +507,7 @@ def trigger_caiso_replots():
 
             plot_daily_fuel_mix_placeholder.pyplot(fig6)
 
+@st.fragment()
 def trigger_isone_replots():
         with col1:
             fig1 = plot_monthly_table_based_on_timerange(isone_load_min_time_filter, isone_load_max_time_filter, 'isone_load')

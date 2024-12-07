@@ -123,8 +123,6 @@ def load_table_based_on_timerange(timemin, timemax, table):
 def plot_monthly_table_based_on_timerange(timemin, timemax, table):
     data = load_table_based_on_timerange(timemin, timemax, table)
 
-
-
     if 'load' in table:
         data_type = 'load'
     else:
@@ -439,12 +437,6 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
             plt.grid(True)
             plt.tight_layout()        
     return fig
-
-#nyiso_load = load_table_based_on_timerange('2019-01-01', None, 'nyiso_load')
-
-#nyiso_load = conn.query('SELECT * FROM nyiso_load WHERE time >= \'2019-01-01\';', ttl="10m")
-
-
 
 st.header('Exploratory Data Analysis', divider='gray')
 

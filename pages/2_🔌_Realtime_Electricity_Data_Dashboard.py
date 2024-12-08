@@ -63,14 +63,10 @@ def plot_day_load(table):
     fig = plt.figure(figsize=(12, 6))
     ax = fig.gca()
     ax.set_xlim(start_time, end_time)
+    plt.xlabel('Hour of Day', fontsize=12)
+    plt.ylabel('Load (MW)', fontsize=12)
+    plt.title(f'Realtime {data_map[table]} Load Data -', fontsize=16)
 
-
-
-    #data_copy['time'] = pd.to_datetime(data_copy['time'])
-    #data_copy.set_index('time', inplace=True)
-
-    #data_copy['Hour'] = data_copy.index.hour
-    
     plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
     plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))

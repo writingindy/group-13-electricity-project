@@ -164,6 +164,7 @@ historical-data-ingestion.py
 pyspark_test.py
 historical-data-ingestion.ipynb
 streamlit-dashboard.ipynb
+load-forecasting.ipynb
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can

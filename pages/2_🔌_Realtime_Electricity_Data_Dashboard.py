@@ -77,9 +77,11 @@ def plot_day_data(table):
     elif 'fuel_mix' in table:
         
         data_dict = data_copy.to_dict()
-        del data_dict['index']
+        data_dict.pop('index')
         time = pd.Series(data_dict['time'])
-        del data_dict['time']
+        data_dict.pop('time')
+        data_dict.pop('interval_start')
+        data_dict.pop('interval_end')
 
         bottoms = pd.Series(np.zeros(len(data_copy)))
         ax = fig.gca()

@@ -52,7 +52,7 @@ caiso_fuel_sources = [
 isone_fuel_sources = [
     'coal', 'hydro', 'landfill_gas', 'natural_gas', 'nuclear', 'oil', 'refuse', 'solar', 'wind', 'wood', 'other']
 
-@st.cache_data
+
 def get_day_data(table):
     today = datetime.date.today()
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)

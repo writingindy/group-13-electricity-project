@@ -72,9 +72,10 @@ def plot_day_data(table):
         plt.xlabel('Hour of Day', fontsize=12)
         plt.ylabel('Load (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Load Data', fontsize=16)
-        plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
+        
 
         plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
+        plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
     elif 'fuel_mix' in table:
         
         data_dict = data_copy.to_dict()

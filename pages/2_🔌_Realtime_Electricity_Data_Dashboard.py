@@ -20,8 +20,8 @@ st.set_page_config(
 )
 
 if not "sleep_time" in st.session_state:
-    st.session_state.sleep_time = 15
-    #st.session_state.sleep_time = 5*60
+    #st.session_state.sleep_time = 15
+    st.session_state.sleep_time = 5*60
 
 if not "auto_refresh" in st.session_state:
     st.session_state.auto_refresh = True
@@ -29,8 +29,8 @@ if not "auto_refresh" in st.session_state:
 auto_refresh = st.sidebar.checkbox('Auto Refresh?', st.session_state.auto_refresh)
 
 if auto_refresh:
-    st.session_state.sleep_time = 15
-    #st.session_state.sleep_time = 5*60
+    #st.session_state.sleep_time = 15
+    st.session_state.sleep_time = 5*60
 
 
 ### Global Variables and Helper Functions
@@ -126,15 +126,16 @@ with nyiso_tab.container():
     nyiso_tab.pyplot(plot_day_data('nyiso_load'))
     nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
 
-#    caiso_tab.pyplot(plot_day_data('caiso_load'))
-#    caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
-#    isone_tab.pyplot(plot_day_data('isone_load'))
-#    isone_tab.pyplot(plot_day_data('isone_fuel_mix'))
-#    time.sleep(10)
-    #time.sleep(60*5)
+with caiso_tab.container():
+    caiso_tab.pyplot(plot_day_data('caiso_load'))
+    caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
+
+with isone_tab.container():
+    isone_tab.pyplot(plot_day_data('isone_load'))
+    isone_tab.pyplot(plot_day_data('isone_fuel_mix'))
 
 
 if auto_refresh:
-    time.sleep(15)
-    #time.sleep(5*60)
+    #time.sleep(15)
+    time.sleep(5*60)
     st.rerun()

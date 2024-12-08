@@ -79,9 +79,14 @@ def plot_day_data(table):
         data_dict = data_copy.to_dict()
         data_dict.pop('index')
         time = pd.Series(data_dict['time'])
-        data_dict.pop('time')
-        data_dict.pop('interval_start', 'No Key Found')
-        data_dict.pop('interval_end', 'No Key Found')
+        if 'nyiso' in table:
+            data_dict.pop('time')
+        elif 'caiso' in table:
+            data_dict.pop('time')
+            data_dict.pop('interval_start', 'No Key Found')
+            data_dict.pop('interval_end', 'No Key Found')
+        elif 'isone' in table:
+            data_dict.pop('time')
 
         bottoms = pd.Series(np.zeros(len(data_copy)))
         ax = fig.gca()

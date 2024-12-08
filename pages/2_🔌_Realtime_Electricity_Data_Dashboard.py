@@ -54,13 +54,17 @@ def get_day_data(table):
 
 def plot_day_load(table):
     data = get_day_data(table)
+    data_copy = data.copy()
 
-    today = datetime.date.today()
-    day_labels = pd.date_range(start=today, periods=24, freq='H')
+    
+    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
+    end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
     
     fig = plt.figure(figsize=(12, 6))
+    ax = fig.gca()
+    ax.set_xlim(start_time, end_time)
 
-    data_copy = data.copy()
+
 
     #data_copy['time'] = pd.to_datetime(data_copy['time'])
     #data_copy.set_index('time', inplace=True)

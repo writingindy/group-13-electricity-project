@@ -86,10 +86,12 @@ def plot_day_data(table):
         plt.ylabel('Total Energy Generation (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
         if 'nyiso' in table or 'isone' in table:
-            plt.stackplot(data_copy['time'], data_copy.drop(columns=['time', 'index']).clip(lower=0).T, baseline='wiggle')
+            y = data_copy.drop(columns=['time', 'index']).clip(lower=0)
+            plt.stackplot(data_copy['time'], y.T, labels=y.columns)
             plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
         elif 'caiso' in table:
-            plt.stackplot(data_copy['time'], data_copy.drop(columns=['time', 'index', 'interval_start', 'interval_end']).clip(lower=0).T, labels=caiso_fuel_sources, baseline='wiggle')
+            y = data_copy.drop(columns=['time', 'index', 'interval_start', 'interval_end']).clip(lower=0)
+            plt.stackplot(data_copy['time'], y.T, labels=y.columns)
             plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
 

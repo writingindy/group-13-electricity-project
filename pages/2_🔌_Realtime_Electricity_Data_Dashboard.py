@@ -110,8 +110,8 @@ nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 for five_min_interval in range(288):
     with nyiso_tab.container():
 
-        st.pyplot(plot_day_data('nyiso_load'))
-        st.pyplot(plot_day_data('nyiso_fuel_mix'))
+        st.write(plot_day_data('nyiso_load'))
+        st.write(plot_day_data('nyiso_fuel_mix'))
 
     caiso_tab.pyplot(plot_day_data('caiso_load'))
     caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))

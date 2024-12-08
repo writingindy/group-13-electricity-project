@@ -19,6 +19,20 @@ st.set_page_config(
     page_icon=':electric_plug',
 )
 
+if not "sleep_time" in st.session_state:
+    st.session_state.sleep_time = 15
+    #st.session_state.sleep_time = 5*60
+
+if not "auto_refresh" in st.session_state:
+    st.session_state.auto_refresh = True
+
+auto_refresh = st.sidebar.checkbox('Auto Refresh?', st.session_state.auto_refresh)
+
+if auto_refresh:
+    st.session_state.sleep_time = 15
+    #st.session_state.sleep_time = 5*60
+
+
 ### Global Variables and Helper Functions
 
 data_map = {'nyiso_load': 'New York', 
@@ -108,10 +122,9 @@ nyiso_placeholder = st.empty()
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 
 #for five_min_interval in range(288):
-#    with nyiso_tab.container():#
-
-#        nyiso_tab.pyplot(plot_day_data('nyiso_load'))
-#        nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
+with nyiso_tab.container():
+    nyiso_tab.pyplot(plot_day_data('nyiso_load'))
+    nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
 
 #    caiso_tab.pyplot(plot_day_data('caiso_load'))
 #    caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
@@ -119,3 +132,9 @@ nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 #    isone_tab.pyplot(plot_day_data('isone_fuel_mix'))
 #    time.sleep(10)
     #time.sleep(60*5)
+
+
+if auto_refresh:
+    time.sleep(15)
+    #time.sleep(5*60)
+    st.experimental_rerun()

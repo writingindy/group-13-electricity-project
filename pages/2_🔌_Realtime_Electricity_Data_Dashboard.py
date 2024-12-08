@@ -137,4 +137,4 @@ with nyiso_tab.container():
 if auto_refresh:
     time.sleep(15)
     #time.sleep(5*60)
-    st.experimental_rerun()
+    st.rerun()

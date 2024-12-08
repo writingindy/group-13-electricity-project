@@ -91,29 +91,8 @@ def plot_day_data(table):
         plt.ylabel('Total Energy Generation (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
         for label, values in data_dict.items():
-            plt.bar(time, pd.Series(values), width=0.3, bottom = bottoms, label=label)
+            plt.bar(time, pd.Series(values), width=0.1, bottom = bottoms, label=label)
             bottoms += pd.Series(values)
-        #for fuel in nyiso_fuel_sources:
-            #for fuel2 in nyiso_fuel_sources:
-                #if fuel2 == fuel:
-                    #bottom = 
-            #plt.bar(data_copy['time'], data_copy[fuel], width=0.3, bottom = )
-        #data_copy.set_index('time', inplace=True)
-        #data_copy.drop('index', inplace=True)
-        #data_copy.plot(kind='bar', stacked=True)
-
-        #data_copy.set_index('time', inplace=True)
-        #data_copy.drop(columns='time', inplace=True)
-        #data_copy.plot(stacked=True)
-        #for fuel_source in nyiso_fuel_sources:
-        #    plt.bar(data_copy['time'],
-        #            data_copy[fuel_source],
-        #            bottom=bottoms,
-        #            label=fuel_source,
-        #            color=cm.get_cmap('tab20c', len(nyiso_fuel_sources))(nyiso_fuel_sources.index(fuel_source)),
-        #            alpha=0.7)
-        #    bottoms = [bottom + value for bottom, value in zip(bottoms, data_copy[fuel_source])]
-
 
 
     return fig

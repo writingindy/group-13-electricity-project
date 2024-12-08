@@ -110,6 +110,7 @@ def plot_day_data(table):
             plt.stackplot(data_copy['time'], y.T, labels=y.columns)
             plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
+        fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)', 'paper_bgcolor': 'rgba(0, 0, 0, 0)',})
 
     return fig
 

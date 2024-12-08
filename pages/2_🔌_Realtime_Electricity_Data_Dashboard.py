@@ -78,6 +78,15 @@ def plot_day_data(table):
         plt.xlabel('Hour of Day', fontsize=12)
         plt.ylabel('Total Energy Generation (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
+        if 'nyiso' in table:
+            for fuel_source in nyiso_fuel_sources:
+                plt.bar(data_copy['time'],
+                    data_copy[fuel_source],
+                    bottom=bottoms,
+                    label=fuel_source,
+                    color=cm.get_cmap('tab20c', len(nyiso_fuel_sources))(nyiso_fuel_sources.index(fuel_source)),
+                    alpha=0.7)
+                bottoms = [bottom + value for bottom, value in zip(bottoms, data_copy[fuel_source])]
 
 
     return fig

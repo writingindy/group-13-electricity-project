@@ -368,18 +368,6 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
             plt.tight_layout()        
     return fig
 
-### Web App by Streamlit
-
-st.title(":electric_plug: Electricity Data Dashboard")
-
-'''
-This web app has two sections:
-- The first section will present a live dashboard of the current day's electricity load and fuel mix, as well as the forecasted load.
-- The second section will present some interactive exploratory data analysis on electricity load and fuel mix data, gathered from the gridstatus API.
-'''
-
-st.header('Live Dashboard', divider='gray')
-
 @st.cache_data
 def get_day_data(table):
     today = datetime.date.today()
@@ -397,6 +385,9 @@ def get_day_data(table):
 
 def plot_day_load(table):
     data = get_day_data(table)
+
+    today = datetime.date.today()
+    day_labels = pd.date_range(start=today, periods=24, freq='H')
     
     fig = plt.figure(figsize=(12, 6))
 
@@ -408,12 +399,22 @@ def plot_day_load(table):
     #data_copy['Hour'] = data_copy.index.hour
     
     plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Average Load')
+    plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
+    plt.xlim([0, 23])
 
     return fig
-    
-    
 
-#today_nyiso_load = get_day_data('nyiso_load')
+### Web App by Streamlit
+
+st.title(":electric_plug: Electricity Data Dashboard")
+
+'''
+This web app has two sections:
+- The first section will present a live dashboard of the current day's electricity load and fuel mix, as well as the forecasted load.
+- The second section will present some interactive exploratory data analysis on electricity load and fuel mix data, gathered from the gridstatus API.
+'''
+
+st.header('Live Dashboard', divider='gray')
 
 
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])

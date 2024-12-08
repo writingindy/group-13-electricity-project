@@ -125,7 +125,7 @@ nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 
 #for five_min_interval in range(288):
 with nyiso_tab.container():
-    nyiso_tab.plotly_chart(plot_day_data('nyiso_load'))
+    nyiso_tab.plotly_chart(plot_day_data('nyiso_load'), theme=None, use_container_width=True)
     nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
 
 with caiso_tab.container():

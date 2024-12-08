@@ -57,7 +57,6 @@ def plot_day_data(table):
     data = get_day_data(table)
     data_copy = data.copy()
 
-    
     start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
     
@@ -77,20 +76,6 @@ def plot_day_data(table):
         plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
         plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
     elif 'fuel_mix' in table:
-        
-        data_dict = data_copy.to_dict()
-        data_dict.pop('index')
-        time = pd.Series(data_dict['time'])
-        if 'nyiso' in table:
-            data_dict.pop('time')
-        elif 'caiso' in table:
-            data_dict.pop('time')
-            data_dict.pop('interval_start', 'No Key Found')
-            data_dict.pop('interval_end', 'No Key Found')
-        elif 'isone' in table:
-            data_dict.pop('time')
-
-        bottoms = pd.Series(np.zeros(len(data_copy)))
         ax = fig.gca()
         ax.set_xlim(start_time, end_time)
         plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
@@ -101,13 +86,10 @@ def plot_day_data(table):
         plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
         if 'nyiso' in table or 'isone' in table:
             plt.stackplot(data_copy['time'], data_copy.drop(columns=['time', 'index']).T)
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
         elif 'caiso' in table:
             plt.stackplot(data_copy['time'], data_copy.drop(columns=['time', 'index', 'interval_start', 'interval_end']).T, labels=caiso_fuel_sources)
-
-        #for label, values in data_dict.items():
-        #    plt.bar(time, pd.Series(values), width=0.1, bottom = bottoms, label=label, align='edge')
-        #    bottoms += pd.Series(values)
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 
 
     return fig

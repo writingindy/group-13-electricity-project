@@ -109,9 +109,6 @@ def plot_day_data(table):
             y = y.fillna(0)
             plt.stackplot(data_copy['time'], y.T, labels=y.columns)
             plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
-
-        fig.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)', 'paper_bgcolor': 'rgba(0, 0, 0, 0)',})
-
     return fig
 
 
@@ -126,7 +123,8 @@ nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 
 #for five_min_interval in range(288):
 with nyiso_tab.container():
-    nyiso_tab.plotly_chart(plot_day_data('nyiso_load'), theme=None, use_container_width=True)
+    nyiso_load = nyiso_tab.plotly_chart(plot_day_data('nyiso_load'), theme=None, use_container_width=True)
+    nyiso_load.update_layout({'plot_bgcolor': 'rgba(0, 0, 0, 0)', 'paper_bgcolor': 'rgba(0, 0, 0, 0)',})
     nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
 
 with caiso_tab.container():

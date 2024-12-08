@@ -13,8 +13,8 @@ warnings.filterwarnings('ignore')
 
 st.set_page_config(
     layout="wide",
-    page_title='Big Data Management Systems: Group 13 Project',
-    page_icon='👋',
+    page_title='Exploratory Data Analysis',
+    page_icon=':chart_with_upwards_trend:',
 )
 
 ### Global Variables and Helper Functions
@@ -35,7 +35,6 @@ caiso_fuel_sources = [
 
 isone_fuel_sources = [
     'coal', 'hydro', 'landfill_gas', 'natural_gas', 'nuclear', 'oil', 'refuse', 'solar', 'wind', 'wood', 'other']
-
 
 @st.cache_data
 def load_table_based_on_timerange(timemin, timemax, table):
@@ -367,73 +366,7 @@ def plot_daily_table_based_on_timerange(timemin, timemax, table):
             plt.tight_layout()        
     return fig
 
-@st.cache_data
-def get_day_data(table):
-    today = datetime.date.today()
-    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-    #today = pd.to_datetime('2024-11-26')
-    #tomorrow = pd.to_datetime('2024-11-27')
-
-    conn = st.connection("postgresql", type="sql")
-    
-    res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{today}\' AND time < \'{tomorrow}\';", ttl="10m")
-    res = res.sort_values(by='time')
-
-    return res
-
-
-def plot_day_load(table):
-    data = get_day_data(table)
-
-    today = datetime.date.today()
-    day_labels = pd.date_range(start=today, periods=24, freq='H')
-    
-    fig = plt.figure(figsize=(12, 6))
-
-    data_copy = data.copy()
-
-    #data_copy['time'] = pd.to_datetime(data_copy['time'])
-    #data_copy.set_index('time', inplace=True)
-
-    #data_copy['Hour'] = data_copy.index.hour
-    
-    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Average Load')
-    plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
-    plt.xlim([0, 23])
-
-    return fig
-
-### Web App by Streamlit
-
-st.title(":electric_plug: Electricity Data Dashboard")
-
-'''
-This web app has two sections:
-- The first section will present a live dashboard of the current day's electricity load and fuel mix, as well as the forecasted load.
-- The second section will present some interactive exploratory data analysis on electricity load and fuel mix data, gathered from the gridstatus API.
-'''
-
-st.header('Live Dashboard', divider='gray')
-
-
-nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
-nyiso_tab.pyplot(plot_day_load('nyiso_load'))
-caiso_tab.pyplot(plot_day_load('caiso_load'))
-isone_tab.pyplot(plot_day_load('isone_load'))
-
-
-
-
-
-st.header('Exploratory Data Analysis', divider='gray')
-
-st.write(
-    "These are EDA plots. You can choose the timerange you want to explore."
-)
-
-#st.subheader("NYISO")
-
-nyiso_eda_tab, caiso_eda_tab, isone_eda_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
+## SPLIT nyiso, caiso, isone replots
 
 @st.fragment()
 def trigger_nyiso_replots():
@@ -510,6 +443,20 @@ def trigger_isone_replots():
             plot_weekly_fuel_mix_placeholder.pyplot(fig5)
 
             plot_daily_fuel_mix_placeholder.pyplot(fig6)
+
+## Streamlit Web App: EDA portion
+
+st.header('Exploratory Data Analysis', divider='gray')
+
+st.write(
+    "These are EDA plots. You can choose the timerange you want to explore."
+)
+
+#st.subheader("NYISO")
+
+nyiso_eda_tab, caiso_eda_tab, isone_eda_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
+
+
 
 
 

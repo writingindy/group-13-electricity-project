@@ -52,26 +52,36 @@ def get_day_data(table):
     return res
 
 
-def plot_day_load(table):
+def plot_day_data(table):
     data = get_day_data(table)
     data_copy = data.copy()
 
     
     start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
+
+    bottoms = [0] * len(data_copy)
     
-    fig = plt.figure(figsize=(12, 6))
+    fig = plt.figure(figsize=(15, 8))
     ax = fig.gca()
     ax.set_xlim(start_time, end_time)
-    plt.xlabel('Hour of Day', fontsize=12)
-    plt.ylabel('Load (MW)', fontsize=12)
-    plt.title(f'Realtime {data_map[table]} Load Data -', fontsize=16)
-
-    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
     plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+    if 'load' in table:
+        plt.xlabel('Hour of Day', fontsize=12)
+        plt.ylabel('Load (MW)', fontsize=12)
+        plt.title(f'Realtime {data_map[table]} Load Data', fontsize=16)
+
+        plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
+    else:
+        plt.xlabel('Hour of Day', fontsize=12)
+        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+        plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
+
 
     return fig
+
+
 
 ## Streamlit Web App: Dashboard portion
 

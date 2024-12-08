@@ -19,7 +19,7 @@ st.set_page_config(
 
 ### Web App by Streamlit
 
-st.title(":electric_plug: Electricity Data Dashboard")
+st.title("👋 Big Data Management Systems: Group 13 Project")
 
 '''
 This web app has two sections:

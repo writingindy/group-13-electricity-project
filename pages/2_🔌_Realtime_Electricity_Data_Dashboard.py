@@ -59,38 +59,63 @@ def plot_day_data(table):
     
     start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
-
-    bottoms = [0] * len(data_copy)
     
-    fig = plt.figure(figsize=(15, 8))
-    ax = fig.gca()
-    ax.set_xlim(start_time, end_time)
-    plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-    plt.grid()
+    fig = plt.figure(figsize=(18, 12))
+    
     if 'load' in table:
+        ax = fig.gca()
+        ax.set_xlim(start_time, end_time)
+        plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+        plt.grid()
         plt.xlabel('Hour of Day', fontsize=12)
         plt.ylabel('Load (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Load Data', fontsize=16)
 
         plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
-    else:
+    elif 'fuel_mix' in table:
+        
+        data_dict = data_copy.to_dict()
+        del data_dict['index']
+        time = pd.Series(data_dict['time'])
+        del data_dict['time']
+
+        bottoms = pd.Series(np.zeros(len(data_copy)))
+        ax = fig.gca()
+        ax.set_xlim(start_time, end_time)
+        plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+        plt.grid()
         plt.xlabel('Hour of Day', fontsize=12)
         plt.ylabel('Total Energy Generation (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
-        if 'nyiso' in table:
-            for fuel_source in nyiso_fuel_sources:
-                plt.bar(data_copy['time'],
-                    data_copy[fuel_source],
-                    bottom=bottoms,
-                    label=fuel_source,
-                    color=cm.get_cmap('tab20c', len(nyiso_fuel_sources))(nyiso_fuel_sources.index(fuel_source)),
-                    alpha=0.7)
-                bottoms = [bottom + value for bottom, value in zip(bottoms, data_copy[fuel_source])]
+        for label, values in data_dict.items():
+            plt.bar(time, pd.Series(values), width=0.3, bottom = bottoms, label=label)
+            bottoms += pd.Series(values)
+        #for fuel in nyiso_fuel_sources:
+            #for fuel2 in nyiso_fuel_sources:
+                #if fuel2 == fuel:
+                    #bottom = 
+            #plt.bar(data_copy['time'], data_copy[fuel], width=0.3, bottom = )
+        #data_copy.set_index('time', inplace=True)
+        #data_copy.drop('index', inplace=True)
+        #data_copy.plot(kind='bar', stacked=True)
+
+        #data_copy.set_index('time', inplace=True)
+        #data_copy.drop(columns='time', inplace=True)
+        #data_copy.plot(stacked=True)
+        #for fuel_source in nyiso_fuel_sources:
+        #    plt.bar(data_copy['time'],
+        #            data_copy[fuel_source],
+        #            bottom=bottoms,
+        #            label=fuel_source,
+        #            color=cm.get_cmap('tab20c', len(nyiso_fuel_sources))(nyiso_fuel_sources.index(fuel_source)),
+        #            alpha=0.7)
+        #    bottoms = [bottom + value for bottom, value in zip(bottoms, data_copy[fuel_source])]
+
 
 
     return fig
-
 
 
 ## Streamlit Web App: Dashboard portion
@@ -104,4 +129,6 @@ nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 nyiso_tab.pyplot(plot_day_data('nyiso_load'))
 nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
 caiso_tab.pyplot(plot_day_data('caiso_load'))
+caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
 isone_tab.pyplot(plot_day_data('isone_load'))
+isone_tab.pyplot(plot_day_data('isone_fuel_mix'))

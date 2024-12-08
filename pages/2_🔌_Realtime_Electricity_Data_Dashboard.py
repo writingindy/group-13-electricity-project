@@ -100,7 +100,7 @@ def plot_day_data(table):
         plt.ylabel('Total Energy Generation (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
         for label, values in data_dict.items():
-            plt.bar(time, pd.Series(values), width=0.01, bottom = bottoms, label=label)
+            plt.bar(time, pd.Series(values), width=0.01, bottom = bottoms, label=label, align='edge')
             bottoms += pd.Series(values)
         plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
 

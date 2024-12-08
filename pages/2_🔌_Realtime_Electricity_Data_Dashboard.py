@@ -111,7 +111,7 @@ for five_min_interval in range(288):
     with nyiso_tab.container():
 
         st.plotly_chart(plot_day_data('nyiso_load'), key='nyiso_load_live')
-        st.plotly_char(plot_day_data('nyiso_fuel_mix'), key='nyiso_fuel_mix_live')
+        st.plotly_chart(plot_day_data('nyiso_fuel_mix'), key='nyiso_fuel_mix_live')
 
     caiso_tab.pyplot(plot_day_data('caiso_load'))
     caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))

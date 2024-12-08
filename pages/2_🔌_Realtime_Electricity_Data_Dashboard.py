@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
 import matplotlib.cm as cm
 import warnings
 import plotly.express as px
@@ -66,9 +67,9 @@ def plot_day_load(table):
 
     #data_copy['Hour'] = data_copy.index.hour
     
-    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Average Load')
-    plt.xticks(range(0, 24), [f'{i}:00' for i in range(0, 24)])
-    plt.xlim([0, 23])
+    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
+    plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
 
     return fig
 

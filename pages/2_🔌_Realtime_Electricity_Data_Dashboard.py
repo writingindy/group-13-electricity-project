@@ -67,10 +67,28 @@ def get_day_data(table):
 
     return res
 
+@st.cache_data
+def get_dayof_forecast(table):
+    conn = st.connection("postgresql", type="sql")
+    today = datetime.date.today()
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+
+
+    res = conn.query(f"SELECT * FROM {table} WHERE ds >= \'{today}\' AND ds < \'{tomorrow}\';")
+
+    return res
+
 
 def plot_day_data(table):
     data = get_day_data(table)
     data_copy = data.copy()
+
+    if 'nyiso' in table:
+        forecast = get_dayof_forecast('forecast_dayof_nyiso')
+    elif 'caiso' in table:
+        forecast = get_dayof_forecast('forecast_dayof_caiso')
+    elif 'isone' in table:
+        forecast = get_dayof_forecast('forecast_dayof_isone')
 
     start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
@@ -89,6 +107,8 @@ def plot_day_data(table):
         
 
         plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
+        plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
+        plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], alpha=0.2)
         plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
     elif 'fuel_mix' in table:
         ax = fig.gca()

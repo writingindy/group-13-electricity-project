@@ -106,9 +106,13 @@ st.header('Live Dashboard', divider='gray')
 
 
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
-nyiso_tab.pyplot(plot_day_data('nyiso_load'))
-nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
-caiso_tab.pyplot(plot_day_data('caiso_load'))
-caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
-isone_tab.pyplot(plot_day_data('isone_load'))
-isone_tab.pyplot(plot_day_data('isone_fuel_mix'))
+
+for five_min_interval in range(288):
+    nyiso_tab.pyplot(plot_day_data('nyiso_load'))
+    nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
+    caiso_tab.pyplot(plot_day_data('caiso_load'))
+    caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
+    isone_tab.pyplot(plot_day_data('isone_load'))
+    isone_tab.pyplot(plot_day_data('isone_fuel_mix'))
+    time.sleep(15)
+    #time.sleep(60*5)

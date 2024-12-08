@@ -91,6 +91,6 @@ st.header('Live Dashboard', divider='gray')
 
 
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
-nyiso_tab.pyplot(plot_day_load('nyiso_load'))
-caiso_tab.pyplot(plot_day_load('caiso_load'))
-isone_tab.pyplot(plot_day_load('isone_load'))
+nyiso_tab.pyplot(plot_day_data('nyiso_load'))
+caiso_tab.pyplot(plot_day_data('caiso_load'))
+isone_tab.pyplot(plot_day_data('isone_load'))

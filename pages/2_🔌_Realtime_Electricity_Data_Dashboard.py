@@ -86,17 +86,39 @@ def get_dayof_forecast(table):
 
 def plot_day_data(table):
     data = get_day_data(table)
+    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
+    end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
+
+    if data.empty:
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+        tomorrow = today + datetime.timedelta(days=1)
+        conn = st.connection("postgresql", type="sql")
+        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{yesterday}\' AND time < \'{today}\';", ttl="10m")
+        res = res.sort_values(by='time')
+
+        data = res.copy()
+        start_time = datetime.datetime.combine(yesterday, datetime.time(0, 0))
+        end_time = datetime.datetime.combine(yesterday, datetime.time(23, 59))
+    
+
+
+        
     data_copy = data.copy()
 
     if 'nyiso' in table:
         forecast = get_dayof_forecast('forecast_dayof_nyiso')
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
     elif 'caiso' in table:
         forecast = get_dayof_forecast('forecast_dayof_caiso')
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
     elif 'isone' in table:
         forecast = get_dayof_forecast('forecast_dayof_isone')
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
 
-    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
     
     fig = plt.figure(figsize=(18, 12))
     

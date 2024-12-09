@@ -125,7 +125,6 @@ def plot_day_data(table):
         ax.set_xlim(start_time, end_time)
         plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
         plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-        ax.set_ylim(bottom=0)
         plt.grid()
         plt.xlabel('Hour of Day', fontsize=12)
         plt.ylabel('Load (MW)', fontsize=12)
@@ -134,6 +133,7 @@ def plot_day_data(table):
         plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
         plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
         plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], alpha=0.2)
+        ax.set_ylim(bottom=0)
         plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
     elif 'fuel_mix' in table:
         ax = fig.gca()

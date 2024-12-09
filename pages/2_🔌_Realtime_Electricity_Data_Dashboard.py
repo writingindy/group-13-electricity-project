@@ -104,6 +104,7 @@ def plot_day_data(table):
         
     data_copy = data.copy()
 
+
     if 'nyiso' in table:
         forecast = get_dayof_forecast('forecast_dayof_nyiso')
         if forecast.empty:
@@ -137,6 +138,7 @@ def plot_day_data(table):
         plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
     elif 'fuel_mix' in table:
         ax = fig.gca()
+        plt.clf()
         ax.set_xlim(start_time, end_time)
         plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
         plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))

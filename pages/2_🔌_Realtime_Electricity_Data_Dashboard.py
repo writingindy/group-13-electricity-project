@@ -167,19 +167,20 @@ st.title(":electric_plug: Real-Time Electricity Data Dashboard")
 st.header('Live Dashboard', divider='gray')
 
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
+load, fuel_mix = st.container()
 
 #for five_min_interval in range(288):
 with nyiso_tab.container():
-    nyiso_tab.pyplot(plot_day_data('nyiso_load'))
-    nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
+    load.pyplot(plot_day_data('nyiso_load'))
+    fuel_mix.pyplot(plot_day_data('nyiso_fuel_mix'))
 
 with caiso_tab.container():
-    caiso_tab.pyplot(plot_day_data('caiso_load'))
-    caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
+    load.pyplot(plot_day_data('caiso_load'))
+    fuel_mix.pyplot(plot_day_data('caiso_fuel_mix'))
 
 with isone_tab.container():
-    isone_tab.pyplot(plot_day_data('isone_load'))
-    isone_tab.pyplot(plot_day_data('isone_fuel_mix'))
+    load.pyplot(plot_day_data('isone_load'))
+    fuel_mix.pyplot(plot_day_data('isone_fuel_mix'))
 
 
 if auto_refresh:

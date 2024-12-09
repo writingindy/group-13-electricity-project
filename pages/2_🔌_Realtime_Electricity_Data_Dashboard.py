@@ -72,7 +72,7 @@ def get_day_data(table):
 
     return res
 
-@st.cache_data
+
 def get_dayof_forecast(table):
     conn = st.connection("postgresql", type="sql")
     today = datetime.date.today()
@@ -129,7 +129,6 @@ def plot_day_data(table):
         plt.xlabel('Hour of Day', fontsize=12)
         plt.ylabel('Load (MW)', fontsize=12)
         plt.title(f'Realtime {data_map[table]} Load Data', fontsize=16)
-        
 
         plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
         plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
@@ -163,7 +162,6 @@ st.title(":electric_plug: Real-Time Electricity Data Dashboard")
 
 st.header('Live Dashboard', divider='gray')
 
-nyiso_placeholder = st.empty()
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 
 #for five_min_interval in range(288):

@@ -101,8 +101,6 @@ def plot_day_data(table):
         start_time = datetime.datetime.combine(yesterday, datetime.time(0, 0))
         end_time = datetime.datetime.combine(yesterday, datetime.time(23, 59))
     
-
-
         
     data_copy = data.copy()
 

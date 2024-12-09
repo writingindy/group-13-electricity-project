@@ -155,8 +155,8 @@ def plot_day_fuel_mix(table):
 
     
     fig = plt.figure(figsize=(18, 12))
-    ax2 = fig.gca()
-    ax2.set_xlim(start_time, end_time)
+    ax = fig.gca()
+    ax.set_xlim(start_time, end_time)
     plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
     plt.grid()

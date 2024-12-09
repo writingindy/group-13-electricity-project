@@ -125,7 +125,7 @@ def plot_day_data(table):
         ax.set_xlim(start_time, end_time)
         plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
         plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-        plt.gca().set_ylim(bottom=0)
+        ax.set_ylim(bottom=0)
         plt.grid()
         plt.xlabel('Hour of Day', fontsize=12)
         plt.ylabel('Load (MW)', fontsize=12)

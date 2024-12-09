@@ -120,6 +120,7 @@ def plot_day_data(table):
 
     
     fig = plt.figure(figsize=(18, 12))
+    fig2 = plt.figure(figsize=(18, 12))
     
     if 'load' in table:
         ax = fig.gca()
@@ -136,10 +137,10 @@ def plot_day_data(table):
         plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], alpha=0.2)
         ax.set_ylim(bottom=0)
         plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
+        return fig
     elif 'fuel_mix' in table:
-        ax = fig.gca()
-        plt.clf()
-        ax.set_xlim(start_time, end_time)
+        ax2 = fig2.gca()
+        ax2.set_xlim(start_time, end_time)
         plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
         plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
         plt.grid()
@@ -156,7 +157,7 @@ def plot_day_data(table):
             y = y.fillna(0)
             plt.stackplot(data_copy['time'], y.T, labels=y.columns)
             plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
-    return fig
+        return fig2
 
 
 ## Streamlit Web App: Dashboard portion

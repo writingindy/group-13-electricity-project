@@ -167,7 +167,8 @@ st.title(":electric_plug: Real-Time Electricity Data Dashboard")
 st.header('Live Dashboard', divider='gray')
 
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
-load, fuel_mix = st.container()
+load = st.container()
+fuel_mix = st.container()
 
 #for five_min_interval in range(288):
 with nyiso_tab.container():

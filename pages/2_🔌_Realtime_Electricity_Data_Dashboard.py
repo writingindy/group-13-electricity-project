@@ -124,7 +124,7 @@ def plot_day_load(table):
     plt.grid()
     plt.xlabel('Hour of Day', fontsize=12)
     plt.ylabel('Load (MW)', fontsize=12)
-    plt.title(f'Realtime {data_map[table]} Load Data', fontsize=16)
+    plt.title(f'Real-time {data_map[table]} Load Data (UTC)', fontsize=16)
 
     plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
     plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
@@ -162,7 +162,7 @@ def plot_day_fuel_mix(table):
     plt.grid()
     plt.xlabel('Hour of Day', fontsize=12)
     plt.ylabel('Total Energy Generation (MW)', fontsize=12)
-    plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
+    plt.title(f'Real-time {data_map[table]} Fuel Mix (UTC)', fontsize=16)
     if 'nyiso' in table or 'isone' in table:
         y = data_copy.drop(columns=['time', 'index']).clip(lower=0)
         y = y.fillna(0)

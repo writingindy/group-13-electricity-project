@@ -64,7 +64,7 @@ def get_day_data(table):
     res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{today}\' AND time < \'{tomorrow}\';", ttl="10m")
     res = res.sort_values(by='time')
 
-    if not res:
+    if res.empty:
         yesterday = today - datetime.timedelta(days=1)
         res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{yesterday}\' AND time < \'{tomorrow}\';", ttl="10m")
         res = res.sort_values(by='time')

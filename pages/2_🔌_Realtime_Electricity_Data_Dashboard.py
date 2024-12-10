@@ -100,15 +100,15 @@ def plot_day_load(table):
         start_time = datetime.datetime.combine(yesterday, datetime.time(0, 0))
         end_time = datetime.datetime.combine(yesterday, datetime.time(23, 59))
 
-    if 'nyiso' in table:
+    if table == 'nyiso_load':
         forecast = get_dayof_forecast('forecast_dayof_nyiso')
         #if forecast.empty:
         #    res = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
-    elif 'caiso' in table:
+    if table == 'caiso_load':
         forecast = get_dayof_forecast('forecast_dayof_caiso')
         #if forecast.empty:
         #    res = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
-    elif 'isone' in table:
+    if 'isone' in table:
         forecast = get_dayof_forecast('forecast_dayof_isone')
         #if forecast.empty:
         #    res = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")

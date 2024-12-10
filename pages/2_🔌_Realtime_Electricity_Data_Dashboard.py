@@ -83,85 +83,6 @@ def get_dayof_forecast(table):
 
     return res
 
-def plot_day_load_nyiso(table):
-    data = get_day_data(table)
-    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
-
-    if data.empty:
-        today = datetime.date.today()
-        yesterday = today - datetime.timedelta(days=1)
-        tomorrow = today + datetime.timedelta(days=1)
-        conn = st.connection("postgresql", type="sql")
-        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{yesterday}\' AND time < \'{today}\';", ttl="10m")
-        res = res.sort_values(by='time')
-
-        data = res.copy()
-        start_time = datetime.datetime.combine(yesterday, datetime.time(0, 0))
-        end_time = datetime.datetime.combine(yesterday, datetime.time(23, 59))
-
-    forecast = get_dayof_forecast('forecast_dayof_nyiso')
-    
-    fig = plt.figure(figsize=(18, 12))
-
-    data_copy = data.copy()
-
-    ax = fig.gca()
-    ax.set_xlim(start_time, end_time)
-    plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-    plt.grid()
-    plt.xlabel('Hour of Day', fontsize=12)
-    plt.ylabel('Load (MW)', fontsize=12)
-    plt.title(f'Real-time {data_map[table]} Load Data (UTC)', fontsize=16)
-
-    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
-    plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
-    plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], alpha=0.2)
-    ax.set_ylim(bottom=0)
-    plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
-    return fig
-
-def plot_day_load_caiso(table):
-    data = get_day_data(table)
-    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
-
-    if data.empty:
-        today = datetime.date.today()
-        yesterday = today - datetime.timedelta(days=1)
-        tomorrow = today + datetime.timedelta(days=1)
-        conn = st.connection("postgresql", type="sql")
-        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{yesterday}\' AND time < \'{today}\';", ttl="10m")
-        res = res.sort_values(by='time')
-
-        data = res.copy()
-        start_time = datetime.datetime.combine(yesterday, datetime.time(0, 0))
-        end_time = datetime.datetime.combine(yesterday, datetime.time(23, 59))
-
-    forecast = get_dayof_forecast('forecast_dayof_caiso')
-    
-    fig = plt.figure(figsize=(18, 12))
-
-    data_copy = data.copy()
-
-    ax = fig.gca()
-    ax.set_xlim(start_time, end_time)
-    plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-    plt.grid()
-    plt.xlabel('Hour of Day', fontsize=12)
-    plt.ylabel('Load (MW)', fontsize=12)
-    plt.title(f'Real-time {data_map[table]} Load Data (UTC)', fontsize=16)
-
-    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
-    plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
-    plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], alpha=0.2)
-    ax.set_ylim(bottom=0)
-    plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
-    return fig
-
-
 def plot_day_load(table):
     data = get_day_data(table)
     start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
@@ -181,16 +102,16 @@ def plot_day_load(table):
 
     if 'nyiso' in table:
         forecast = get_dayof_forecast('forecast_dayof_nyiso')
-        #if forecast.empty:
-        #    res = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
     elif 'caiso' in table:
         forecast = get_dayof_forecast('forecast_dayof_caiso')
-        #if forecast.empty:
-        #    res = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
     elif 'isone' in table:
         forecast = get_dayof_forecast('forecast_dayof_isone')
-        #if forecast.empty:
-        #    res = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
     
     fig = plt.figure(figsize=(18, 12))
 
@@ -268,13 +189,13 @@ nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 with nyiso_tab.container():
     load = st.container()
     fuel_mix = st.container()
-    load.pyplot(plot_day_load_nyiso('nyiso_load'))
+    load.pyplot(plot_day_load('nyiso_load'))
     fuel_mix.pyplot(plot_day_fuel_mix('nyiso_fuel_mix'))
 
 with caiso_tab.container():
     load = st.container()
     fuel_mix = st.container()
-    load.pyplot(plot_day_load_caiso('caiso_load'))
+    load.pyplot(plot_day_load('caiso_load'))
     fuel_mix.pyplot(plot_day_fuel_mix('caiso_fuel_mix'))
 
 with isone_tab.container():

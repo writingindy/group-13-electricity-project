@@ -106,16 +106,16 @@ def plot_day_data(table):
 
     if 'nyiso' in table:
         forecast = get_dayof_forecast('forecast_dayof_nyiso')
-        if forecast.empty:
-            res = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+        #if forecast.empty:
+        #    forecast = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
     elif 'caiso' in table:
         forecast = get_dayof_forecast('forecast_dayof_caiso')
-        if forecast.empty:
-            res = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+        #if forecast.empty:
+        #    forecast = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
     elif 'isone' in table:
         forecast = get_dayof_forecast('forecast_dayof_isone')
-        if forecast.empty:
-            res = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+        #if forecast.empty:
+        #    forecast = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
 
     
     fig = plt.figure(figsize=(18, 12))

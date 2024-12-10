@@ -162,6 +162,7 @@ cython_debug/
 # Jupyter Notebooks and Python scripts
 historical-data-ingestion.py
 pyspark_test.py
+forecast-model.py
 historical-data-ingestion.ipynb
 streamlit-dashboard.ipynb
 load-forecasting.ipynb

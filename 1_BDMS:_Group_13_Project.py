@@ -12,7 +12,7 @@ import psycopg2
 warnings.filterwarnings('ignore')
 
 st.set_page_config(
-    layout="wide",
+    #layout="wide",
     page_title='Big Data Management Systems: Group 13 Project',
     page_icon='👋',
 )

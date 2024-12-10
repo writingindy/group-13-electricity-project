@@ -87,6 +87,10 @@ def plot_day_load(table):
     data = get_day_data(table)
     start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
+    
+    today = datetime.date.today()
+    yesterday = today - datetime.timedelta(days=1)
+    tomorrow = today + datetime.timedelta(days=1)
 
     if data.empty:
         today = datetime.date.today()

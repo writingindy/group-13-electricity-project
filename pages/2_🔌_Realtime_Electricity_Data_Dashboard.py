@@ -14,7 +14,7 @@ import psycopg2
 warnings.filterwarnings('ignore')
 
 st.set_page_config(
-    #layout="wide",
+    layout="wide",
     page_title='Real-Time Electricity Data Dashboard',
     page_icon=':electric_plug',
 )

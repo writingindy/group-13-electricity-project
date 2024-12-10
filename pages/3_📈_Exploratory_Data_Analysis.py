@@ -12,7 +12,7 @@ import psycopg2
 warnings.filterwarnings('ignore')
 
 st.set_page_config(
-    #layout="wide",
+    layout="wide",
     page_title='Exploratory Data Analysis',
     page_icon=':chart_with_upwards_trend:',
 )

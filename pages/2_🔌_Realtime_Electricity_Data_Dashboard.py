@@ -83,57 +83,8 @@ def get_dayof_forecast(table):
 
     return res
 
-def plot_day_load(table):
-    data = get_day_data(table)
-    start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
-    end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
 
-    if data.empty:
-        today = datetime.date.today()
-        yesterday = today - datetime.timedelta(days=1)
-        tomorrow = today + datetime.timedelta(days=1)
-        conn = st.connection("postgresql", type="sql")
-        res = conn.query(f"SELECT * FROM {table} WHERE time >= \'{yesterday}\' AND time < \'{today}\';", ttl="10m")
-        res = res.sort_values(by='time')
-
-        data = res.copy()
-        start_time = datetime.datetime.combine(yesterday, datetime.time(0, 0))
-        end_time = datetime.datetime.combine(yesterday, datetime.time(23, 59))
-
-    if 'nyiso' in table:
-        forecast = get_dayof_forecast('forecast_dayof_nyiso')
-        if forecast.empty:
-            res = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
-    elif 'caiso' in table:
-        forecast = get_dayof_forecast('forecast_dayof_caiso')
-        if forecast.empty:
-            res = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
-    elif 'isone' in table:
-        forecast = get_dayof_forecast('forecast_dayof_isone')
-        if forecast.empty:
-            res = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
-    
-    fig = plt.figure(figsize=(18, 12))
-
-    data_copy = data.copy()
-
-    ax = fig.gca()
-    ax.set_xlim(start_time, end_time)
-    plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-    plt.grid()
-    plt.xlabel('Hour of Day', fontsize=12)
-    plt.ylabel('Load (MW)', fontsize=12)
-    plt.title(f'Real-time {data_map[table]} Load Data (UTC)', fontsize=16)
-
-    plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
-    plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
-    plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], alpha=0.2)
-    ax.set_ylim(bottom=0)
-    plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
-    return fig
-
-def plot_day_fuel_mix(table):
+def plot_day_data(table):
     data = get_day_data(table)
     start_time = datetime.datetime.combine(datetime.date.today(), datetime.time(0, 0))
     end_time = datetime.datetime.combine(datetime.date.today(), datetime.time(23, 59))
@@ -153,26 +104,56 @@ def plot_day_fuel_mix(table):
         
     data_copy = data.copy()
 
+    if 'nyiso' in table:
+        forecast = get_dayof_forecast('forecast_dayof_nyiso')
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_nyiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+    elif 'caiso' in table:
+        forecast = get_dayof_forecast('forecast_dayof_caiso')
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_caiso WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+    elif 'isone' in table:
+        forecast = get_dayof_forecast('forecast_dayof_isone')
+        if forecast.empty:
+            res = conn.query(f"SELECT * FROM forecast_dayof_isone WHERE ds >= \'{yesterday}\' AND ds < \'{today}\';")
+
     
     fig = plt.figure(figsize=(18, 12))
-    ax = fig.gca()
-    ax.set_xlim(start_time, end_time)
-    plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
-    plt.grid()
-    plt.xlabel('Hour of Day', fontsize=12)
-    plt.ylabel('Total Energy Generation (MW)', fontsize=12)
-    plt.title(f'Real-time {data_map[table]} Fuel Mix (UTC)', fontsize=16)
-    if 'nyiso' in table or 'isone' in table:
-        y = data_copy.drop(columns=['time', 'index']).clip(lower=0)
-        y = y.fillna(0)
-        plt.stackplot(data_copy['time'], y.T, labels=y.columns)
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
-    elif 'caiso' in table:
-        y = data_copy.drop(columns=['time', 'index', 'interval_start', 'interval_end']).clip(lower=0)
-        y = y.fillna(0)
-        plt.stackplot(data_copy['time'], y.T, labels=y.columns)
-        plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+    
+    if 'load' in table:
+        ax = fig.gca()
+        ax.set_xlim(start_time, end_time)
+        plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+        plt.grid()
+        plt.xlabel('Hour of Day', fontsize=12)
+        plt.ylabel('Load (MW)', fontsize=12)
+        plt.title(f'Realtime {data_map[table]} Load Data', fontsize=16)
+
+        plt.plot(data_copy['time'], data_copy['load'], color='blue', linewidth=3, label='Real Load')
+        plt.plot(forecast['ds'], forecast['yhat'], '--', label='Forecasted load')
+        plt.fill_between(forecast['ds'], forecast['yhat_lower'], forecast['yhat_upper'], alpha=0.2)
+        ax.set_ylim(bottom=0)
+        plt.legend(title="Load", bbox_to_anchor=(1.05, 1), loc='upper right')
+    elif 'fuel_mix' in table:
+        ax = fig.gca()
+        ax.set_xlim(start_time, end_time)
+        plt.gca().xaxis.set_major_locator(mdates.HourLocator(interval=1))
+        plt.gca().xaxis.set_major_formatter(mdates.DateFormatter("%H:%M"))
+        plt.grid()
+        plt.xlabel('Hour of Day', fontsize=12)
+        plt.ylabel('Total Energy Generation (MW)', fontsize=12)
+        plt.title(f'Realtime {data_map[table]} Fuel Mix', fontsize=16)
+        if 'nyiso' in table or 'isone' in table:
+            y = data_copy.drop(columns=['time', 'index']).clip(lower=0)
+            y = y.fillna(0)
+            plt.stackplot(data_copy['time'], y.T, labels=y.columns)
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
+        elif 'caiso' in table:
+            y = data_copy.drop(columns=['time', 'index', 'interval_start', 'interval_end']).clip(lower=0)
+            y = y.fillna(0)
+            plt.stackplot(data_copy['time'], y.T, labels=y.columns)
+            plt.legend(title="Energy Sources", bbox_to_anchor=(1.05, 1), loc='upper right')
     return fig
 
 
@@ -184,25 +165,18 @@ st.header('Live Dashboard', divider='gray')
 
 nyiso_tab, caiso_tab, isone_tab = st.tabs(["NYISO", "CAISO", "ISONE"])
 
-
 #for five_min_interval in range(288):
 with nyiso_tab.container():
-    load = st.container()
-    fuel_mix = st.container()
-    load.pyplot(plot_day_load('nyiso_load'))
-    fuel_mix.pyplot(plot_day_fuel_mix('nyiso_fuel_mix'))
+    nyiso_tab.pyplot(plot_day_data('nyiso_load'))
+    nyiso_tab.pyplot(plot_day_data('nyiso_fuel_mix'))
 
 with caiso_tab.container():
-    load = st.container()
-    fuel_mix = st.container()
-    load.pyplot(plot_day_load('caiso_load'))
-    fuel_mix.pyplot(plot_day_fuel_mix('caiso_fuel_mix'))
+    caiso_tab.pyplot(plot_day_data('caiso_load'))
+    caiso_tab.pyplot(plot_day_data('caiso_fuel_mix'))
 
 with isone_tab.container():
-    load = st.container()
-    fuel_mix = st.container()
-    load.pyplot(plot_day_load('isone_load'))
-    fuel_mix.pyplot(plot_day_fuel_mix('isone_fuel_mix'))
+    isone_tab.pyplot(plot_day_data('isone_load'))
+    isone_tab.pyplot(plot_day_data('isone_fuel_mix'))
 
 
 if auto_refresh:

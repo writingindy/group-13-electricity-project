@@ -456,6 +456,99 @@ st.write(
 isone_eda_tab, nyiso_eda_tab, caiso_eda_tab = st.tabs(["ISONE", "NYISO", "CAISO"])
 
 
+with isone_eda_tab:
+    st.write("EDA plots for ISONE.")
+
+    col1, col2 = st.columns(2, vertical_alignment = "center")
+
+    with col1:
+        isone_load_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2023-01-01'), 
+                                            min_value=pd.to_datetime('2022-07-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_isone_replots,
+                                            key='isone_load_min')
+        isone_load_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2022-07-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_isone_replots,
+                                            key='isone_load_max')
+        plot_monthly_placeholder = st.empty()
+        plot_weekly_placeholder = st.empty()
+        plot_daily_placeholder = st.empty() 
+        plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(isone_load_min_time_filter, isone_load_max_time_filter, 'isone_load'))
+        plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(isone_load_min_time_filter, isone_load_max_time_filter, 'isone_load'))
+        plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(isone_load_min_time_filter, isone_load_max_time_filter, 'isone_load'))
+
+    with col2:
+        isone_fuel_mix_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2018-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_isone_replots,
+                                            key='isone_fuel_mix_min')
+        isone_fuel_mix_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2018-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_isone_replots,
+                                            key='isone_fuel_mix_max')
+
+        plot_monthly_fuel_mix_placeholder = st.empty()
+        plot_weekly_fuel_mix_placeholder = st.empty()
+        plot_daily_fuel_mix_placeholder = st.empty()
+        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(isone_fuel_mix_min_time_filter, isone_fuel_mix_max_time_filter, 'isone_fuel_mix'))
+        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(isone_fuel_mix_min_time_filter, isone_fuel_mix_max_time_filter, 'isone_fuel_mix'))
+        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(isone_fuel_mix_min_time_filter, isone_fuel_mix_max_time_filter, 'isone_fuel_mix'))
+
+    
+
+with nyiso_eda_tab:
+    st.write("EDA plots for NYISO.")
+
+    col1, col2 = st.columns(2, vertical_alignment = "center")
+
+    with col1:
+        nyiso_load_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_load_min')
+        nyiso_load_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_load_max')
+        plot_monthly_placeholder = st.empty()
+        plot_weekly_placeholder = st.empty()
+        plot_daily_placeholder = st.empty() 
+        plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
+        plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
+        plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
+
+    with col2:
+        nyiso_fuel_mix_min_time_filter = st.date_input("Start date:", 
+                                            value=pd.to_datetime('2021-01-01'), 
+                                            min_value=pd.to_datetime('2018-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_fuel_mix_min')
+        nyiso_fuel_mix_max_time_filter = st.date_input("End date:", 
+                                            value=datetime.date.today(), 
+                                            min_value=pd.to_datetime('2002-01-01'), 
+                                            max_value=datetime.date.today(),
+                                            on_change=trigger_nyiso_replots,
+                                            key='nyiso_fuel_mix_max')
+
+        plot_monthly_fuel_mix_placeholder = st.empty()
+        plot_weekly_fuel_mix_placeholder = st.empty()
+        plot_daily_fuel_mix_placeholder = st.empty()
+        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
+        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
+        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
 
 
 
@@ -506,97 +599,3 @@ with caiso_eda_tab:
         plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix'))
         plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(caiso_fuel_mix_min_time_filter, caiso_fuel_mix_max_time_filter, 'caiso_fuel_mix'))
 
-with nyiso_eda_tab:
-    st.write("EDA plots for NYISO.")
-
-    col1, col2 = st.columns(2, vertical_alignment = "center")
-
-    with col1:
-        nyiso_load_min_time_filter = st.date_input("Start date:", 
-                                            value=pd.to_datetime('2021-01-01'), 
-                                            min_value=pd.to_datetime('2002-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_nyiso_replots,
-                                            key='nyiso_load_min')
-        nyiso_load_max_time_filter = st.date_input("End date:", 
-                                            value=datetime.date.today(), 
-                                            min_value=pd.to_datetime('2002-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_nyiso_replots,
-                                            key='nyiso_load_max')
-        plot_monthly_placeholder = st.empty()
-        plot_weekly_placeholder = st.empty()
-        plot_daily_placeholder = st.empty() 
-        plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
-        plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
-        plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_load_min_time_filter, nyiso_load_max_time_filter, 'nyiso_load'))
-
-    with col2:
-        nyiso_fuel_mix_min_time_filter = st.date_input("Start date:", 
-                                            value=pd.to_datetime('2021-01-01'), 
-                                            min_value=pd.to_datetime('2018-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_nyiso_replots,
-                                            key='nyiso_fuel_mix_min')
-        nyiso_fuel_mix_max_time_filter = st.date_input("End date:", 
-                                            value=datetime.date.today(), 
-                                            min_value=pd.to_datetime('2002-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_nyiso_replots,
-                                            key='nyiso_fuel_mix_max')
-
-        plot_monthly_fuel_mix_placeholder = st.empty()
-        plot_weekly_fuel_mix_placeholder = st.empty()
-        plot_daily_fuel_mix_placeholder = st.empty()
-        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
-        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
-        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(nyiso_fuel_mix_min_time_filter, nyiso_fuel_mix_max_time_filter, 'nyiso_fuel_mix'))
-
-
-with isone_eda_tab:
-    st.write("EDA plots for ISONE.")
-
-    col1, col2 = st.columns(2, vertical_alignment = "center")
-
-    with col1:
-        isone_load_min_time_filter = st.date_input("Start date:", 
-                                            value=pd.to_datetime('2023-01-01'), 
-                                            min_value=pd.to_datetime('2022-07-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_isone_replots,
-                                            key='isone_load_min')
-        isone_load_max_time_filter = st.date_input("End date:", 
-                                            value=datetime.date.today(), 
-                                            min_value=pd.to_datetime('2022-07-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_isone_replots,
-                                            key='isone_load_max')
-        plot_monthly_placeholder = st.empty()
-        plot_weekly_placeholder = st.empty()
-        plot_daily_placeholder = st.empty() 
-        plot_monthly_placeholder.pyplot(plot_monthly_table_based_on_timerange(isone_load_min_time_filter, isone_load_max_time_filter, 'isone_load'))
-        plot_weekly_placeholder.pyplot(plot_weekly_table_based_on_timerange(isone_load_min_time_filter, isone_load_max_time_filter, 'isone_load'))
-        plot_daily_placeholder.pyplot(plot_daily_table_based_on_timerange(isone_load_min_time_filter, isone_load_max_time_filter, 'isone_load'))
-
-    with col2:
-        isone_fuel_mix_min_time_filter = st.date_input("Start date:", 
-                                            value=pd.to_datetime('2021-01-01'), 
-                                            min_value=pd.to_datetime('2018-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_isone_replots,
-                                            key='isone_fuel_mix_min')
-        isone_fuel_mix_max_time_filter = st.date_input("End date:", 
-                                            value=datetime.date.today(), 
-                                            min_value=pd.to_datetime('2018-01-01'), 
-                                            max_value=datetime.date.today(),
-                                            on_change=trigger_isone_replots,
-                                            key='isone_fuel_mix_max')
-
-        plot_monthly_fuel_mix_placeholder = st.empty()
-        plot_weekly_fuel_mix_placeholder = st.empty()
-        plot_daily_fuel_mix_placeholder = st.empty()
-        plot_monthly_fuel_mix_placeholder.pyplot(plot_monthly_table_based_on_timerange(isone_fuel_mix_min_time_filter, isone_fuel_mix_max_time_filter, 'isone_fuel_mix'))
-        plot_weekly_fuel_mix_placeholder.pyplot(plot_weekly_table_based_on_timerange(isone_fuel_mix_min_time_filter, isone_fuel_mix_max_time_filter, 'isone_fuel_mix'))
-        plot_daily_fuel_mix_placeholder.pyplot(plot_daily_table_based_on_timerange(isone_fuel_mix_min_time_filter, isone_fuel_mix_max_time_filter, 'isone_fuel_mix'))
-
-    

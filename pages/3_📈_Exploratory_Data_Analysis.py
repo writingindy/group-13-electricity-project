@@ -453,7 +453,7 @@ st.write(
 )
 
 #st.subheader("NYISO")
-caiso_eda_tab, nyiso_eda_tab, isone_eda_tab = st.tabs(["CAISO", "NYISO", "ISONE"])
+isone_eda_tab, nyiso_eda_tab, caiso_eda_tab = st.tabs(["ISONE", "NYISO", "CAISO"])
 
 
 

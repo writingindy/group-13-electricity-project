@@ -163,7 +163,8 @@ st.title(":electric_plug: Real-Time Electricity Data Dashboard")
 
 st.header('Live Dashboard', divider='gray')
 
-caiso_tab, nyiso_tab, isone_tab = st.tabs(["CAISO", "NYISO", "ISONE"])
+
+isone_tab, caiso_tab, nyiso_tab  = st.tabs(["ISONE", "NYISO", "CAISO"])
 
 
 with caiso_tab.container():

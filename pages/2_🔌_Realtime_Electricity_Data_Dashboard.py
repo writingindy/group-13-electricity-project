@@ -164,7 +164,7 @@ st.title(":electric_plug: Real-Time Electricity Data Dashboard")
 st.header('Live Dashboard', divider='gray')
 
 
-isone_tab, caiso_tab, nyiso_tab  = st.tabs(["ISONE", "NYISO", "CAISO"])
+isone_tab, caiso_tab, nyiso_tab  = st.tabs(["ISONE", "CAISO", "NYISO"])
 
 with isone_tab.container():
     isone_tab.pyplot(plot_day_data('isone_load'))
